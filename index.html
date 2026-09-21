@@ -18,27 +18,41 @@ button{border:0;border-radius:999px;padding:10px 15px;background:#fff;color:var(
 .speak{padding:5px 8px;margin-left:6px;box-shadow:none;background:var(--pale)}.quiz{max-width:850px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{text-align:left;border:2px solid var(--line)}
 .correct{background:#edf7f0!important;border-color:#4d8a63!important}.wrong{background:#fbefef!important;border-color:#b95f5f!important}.question{font-size:22px;font-weight:900;margin:16px 0}.score{font-weight:900;color:var(--dark)}
 .read-note{padding:22px;background:#fff8dc;border-radius:16px;line-height:1.7}.esl-head{font-size:20px;font-weight:900;margin-bottom:12px}
-@media(max-width:720px){.vocab{grid-template-columns:1fr}.choices{grid-template-columns:1fr}}
+.reading-shell{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start;padding-bottom:92px}
+.reading-text{background:#fff;border-radius:20px;padding:22px;box-shadow:var(--shadow);font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.8}
+.reading-paragraph{margin:0 0 18px;padding:8px 10px;border-radius:12px;cursor:pointer;transition:.15s}
+.reading-paragraph.current{background:#edf5fc;box-shadow:inset 4px 0 0 var(--blue)}
+.reading-paragraph.heading{font-weight:900;font-size:21px;font-family:ui-rounded,"SF Pro Rounded","PingFang TC",system-ui,sans-serif;margin-top:10px}
+.read-vocab{color:#1769aa;font-weight:900;cursor:pointer;text-decoration:none;border-bottom:1px dotted #1769aa}
+.read-side{position:sticky;top:14px;background:#fff;border-radius:18px;padding:15px;box-shadow:var(--shadow);font-size:14px;line-height:1.55}
+.read-side .rvword{font-size:22px;font-weight:900;color:var(--dark)}.read-side .rvmark{font-weight:900;margin-right:5px}
+.reader-controls{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:30;display:flex;gap:7px;flex-wrap:wrap;justify-content:center;align-items:center;background:#ffffffee;backdrop-filter:blur(9px);padding:10px 12px;border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 28px #1f385333;max-width:calc(100vw - 24px)}
+.reader-controls button{padding:8px 11px;font-size:13px}.reader-controls select{border:1px solid var(--line);border-radius:999px;padding:8px;background:#fff;font-weight:700}
+.read-count{color:var(--muted);font-size:12px;font-weight:800;min-width:58px;text-align:center}
+@media(max-width:820px){.reading-shell{grid-template-columns:1fr}.read-side{position:static;order:-1}.reader-controls{bottom:8px}}
+@media(max-width:720px){.vocab{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.reading-text{font-size:17px;padding:15px}}
 </style></head><body><div class="wrap">
-<header><h1>KCIS G4 Learning</h1><p>Reading：課文 × Vocabulary × Quiz　｜　ESL Vocabulary Practice</p></header>
+<header><h1>KCIS G4 Learning</h1><p>Reading • ESL • Vocabulary • Quiz</p></header>
 <nav class="tabs"><button class="top active" data-page="reading">📚 Reading</button><button class="top" data-page="esl">✏️ ESL</button><button class="top" data-page="quiz">🎯 Quiz</button></nav>
 <section id="home"></section><section id="study" class="hidden"></section>
 </div><script>
-let words=[],page="reading",activeTitle="",activeMode="vocab",quizSet=[],qi=0,correct=0,answered=0;
+let words=[],readings=[],page="reading",activeTitle="",activeMode="vocab",quizSet=[],qi=0,correct=0,answered=0,readerIndex=0,readerAuto=false,readerRate=.95;
 const titleAliases={"From Minn of the Mississippi":"from Minn of the Mississippi","from Butterfly Eyes and Other Secrets of the Meadow":"from Butterfly Eyes","Feathers, Not Just for Flying":"Feathers, Not just for fling"};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function base(g){return g.replace(/-skills vocab$/,"").replace(/-P[12]$/,"")}
 function isESL(g){return g.startsWith("ESL2 Lesson")}
-function readingTitles(){return [...new Set(words.filter(w=>!isESL(w.group)).map(w=>base(w.group)))]}
-function groupsFor(t){return [...new Set(words.filter(w=>base(w.group)===t).map(w=>w.group))]}
+function practiceTitle(t){return titleAliases[t]||t}
+function readingTitles(){return readings.length?readings.map(a=>a.title):[...new Set(words.filter(w=>!isESL(w.group)).map(w=>base(w.group)))]}
+function groupsFor(t){const pt=practiceTitle(t);return [...new Set(words.filter(w=>base(w.group)===pt).map(w=>w.group))]}
+function articleFor(t){return readings.find(a=>a.title===t)}
 function renderHome(){
  const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
- if(page==="quiz"){renderQuizHome();return}\n if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
+ if(page==="quiz"){renderQuizHome();return}\n if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button>${groupsFor(t).length?`<button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button>`:""}</div></article>`).join("")+'</div>'}
  else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
 }
 
 function renderQuizHome(){
- const reading=readingTitles(), esl=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];
+ const reading=readingTitles().filter(t=>groupsFor(t).length), esl=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];
  document.getElementById("home").innerHTML=`
  <div class="panel">
    <div class="mode-title">🎯 Quiz</div>
@@ -67,20 +81,63 @@ function drawGlobalQ(){
  root.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>{if(root.querySelector(".choice.correct,.choice.wrong"))return;answered++;root.querySelectorAll(".choice").forEach(x=>{if(x.dataset.w===w.word)x.classList.add("correct")});if(btn.dataset.w===w.word){correct++;document.getElementById("gfb").textContent="✅ Correct!"}else{btn.classList.add("wrong");document.getElementById("gfb").textContent="❌ 正確答案是 "+w.word}setTimeout(()=>{qi++;drawGlobalQ()},700)});
 }
 function openUnit(t,m){activeTitle=t;activeMode=m;showStudy()} function openESL(g,m){activeTitle=g;activeMode=m;showStudy()}
-function pool(){return page==="reading"?words.filter(w=>base(w.group)===activeTitle):words.filter(w=>w.group===activeTitle)}
+function pool(){return page==="reading"?words.filter(w=>base(w.group)===practiceTitle(activeTitle)):words.filter(w=>w.group===activeTitle)}
 function showStudy(){
  document.getElementById("home").classList.add("hidden");const s=document.getElementById("study");s.classList.remove("hidden");
  const modes=page==="reading"?["read","vocab"]:["vocab"];
  s.innerHTML=`<button class="back" onclick="renderHome()">← 回到${page==="reading"?" Reading Library":" ESL"}</button><div class="mode-title">${esc(activeTitle)}</div><div class="subtabs">${modes.map(m=>`<button class="${m===activeMode?"active":""}" onclick="switchMode('${m}')">${m==="read"?"📖 Read":m==="vocab"?"📝 Vocabulary":"🎯 Quiz"}</button>`).join("")}</div><div id="modeBody"></div>`;
  renderMode();
 }
-function switchMode(m){activeMode=m;showStudy()}
+function switchMode(m){stopReading();activeMode=m;showStudy()}
 function renderMode(){
  if(activeMode==="vocab")renderVocab();else if(activeMode==="quiz")startQuiz();else renderRead();
 }
-function renderRead(){
+function rx(s){return String(s).replace(/[.*+?^$\{\}()|[\]\\]/g,"\\function renderRead(){
  const b=document.getElementById("modeBody");
  b.innerHTML=`<div class="read-note"><b>📖 課文閱讀模式</b><br>這篇文章的 Vocabulary 已經與同一個 Reading unit 整合。完整課文與逐段朗讀資料正在從原 Reading Library 移入同一個資料來源；在完成資料搬移前，Vocabulary 與 Quiz 已先依文章整合，不會建立第二套重複單字。</div>`;
+}")}
+function markedParagraph(text,vocab){
+ if(!vocab||!vocab.length)return esc(text);
+ const map=new Map(vocab.map((v,i)=>[String(v.word).toLowerCase(),i]));
+ const pats=[...map.keys()].sort((a,b)=>b.length-a.length).map(rx);
+ const re=new RegExp("(?<![A-Za-z])("+pats.join("|")+")(?![A-Za-z])","gi");
+ let out="",last=0,m;
+ while((m=re.exec(text))){out+=esc(text.slice(last,m.index));const key=m[0].toLowerCase(),i=map.get(key);out+=`<span class="read-vocab" data-v="${i}" onclick="event.stopPropagation();showReadVocab(Number(this.dataset.v))">${esc(m[0])}</span>`;last=m.index+m[0].length}
+ return out+esc(text.slice(last));
+}
+function renderRead(){
+ const b=document.getElementById("modeBody"),a=articleFor(activeTitle);
+ if(!a){b.innerHTML='<div class="read-note">這篇課文資料目前尚未載入，請重新整理頁面。</div>';return}
+ const saved=Number(localStorage.getItem("kcis-read:"+activeTitle));readerIndex=Number.isFinite(saved)&&saved>=0&&saved<a.paragraphs.length?saved:0;
+ const paras=a.paragraphs.map((p,i)=>{const heading=p.length<70&&!/[.!?]["']?$/.test(p);return `<p class="reading-paragraph ${heading?"heading":""}" data-i="${i}" onclick="selectParagraph(${i})">${markedParagraph(p,a.vocab)}</p>`}).join("");
+ b.innerHTML=`<div class="reading-shell"><div class="reading-text" id="readingText">${paras}</div><aside class="read-side" id="readVocabCard"><b>Vocabulary</b><div class="hint" style="margin-top:6px">點藍色生字可查看中文並聽發音。</div></aside></div>
+ <div class="reader-controls"><button onclick="continueReading()">▶︎ 繼續朗讀</button><button onclick="restartReading()">↺ 從頭播放</button><button onclick="prevParagraph()">← 上一段</button><button onclick="speakCurrent()">🔊 本段</button><button onclick="nextParagraph()">下一段 →</button><button onclick="togglePause()">⏸ Pause</button><button onclick="stopReading()">■ Stop</button><select id="readerRate" onchange="readerRate=Number(this.value)"><option value=".75">0.75×</option><option value=".85">0.85×</option><option value=".95" selected>0.95×</option><option value="1.05">1.05×</option><option value="1.15">1.15×</option></select><span class="read-count" id="readCount"></span></div>`;
+ setCurrentParagraph(readerIndex,false);
+}
+function setCurrentParagraph(i,scroll){
+ const a=articleFor(activeTitle);if(!a)return;readerIndex=Math.max(0,Math.min(i,a.paragraphs.length-1));localStorage.setItem("kcis-read:"+activeTitle,readerIndex);
+ document.querySelectorAll(".reading-paragraph").forEach(x=>x.classList.toggle("current",Number(x.dataset.i)===readerIndex));
+ const n=document.getElementById("readCount");if(n)n.textContent=(readerIndex+1)+" / "+a.paragraphs.length;
+ if(scroll){const el=document.querySelector('.reading-paragraph[data-i="'+readerIndex+'"]');if(el)el.scrollIntoView({behavior:"smooth",block:"center"})}
+}
+function selectParagraph(i){readerAuto=false;speechSynthesis.cancel();setCurrentParagraph(i,false)}
+function speakParagraph(i,auto){
+ const a=articleFor(activeTitle);if(!a||!("speechSynthesis"in window))return;setCurrentParagraph(i,true);speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(a.paragraphs[readerIndex]);u.lang="en-US";u.rate=readerRate;if(voice)u.voice=voice;
+ u.onend=()=>{if(readerAuto&&auto&&readerIndex<a.paragraphs.length-1){setCurrentParagraph(readerIndex+1,true);speakParagraph(readerIndex,true)}else if(readerAuto&&readerIndex>=a.paragraphs.length-1){readerAuto=false}};
+ speechSynthesis.speak(u);
+}
+function continueReading(){readerAuto=true;speakParagraph(readerIndex,true)}
+function restartReading(){readerAuto=true;setCurrentParagraph(0,true);speakParagraph(0,true)}
+function prevParagraph(){readerAuto=false;speechSynthesis.cancel();setCurrentParagraph(readerIndex-1,true)}
+function nextParagraph(){readerAuto=false;speechSynthesis.cancel();setCurrentParagraph(readerIndex+1,true)}
+function speakCurrent(){readerAuto=false;speakParagraph(readerIndex,false)}
+function togglePause(){if(!("speechSynthesis"in window))return;if(speechSynthesis.paused)speechSynthesis.resume();else speechSynthesis.pause()}
+function stopReading(){readerAuto=false;if("speechSynthesis"in window)speechSynthesis.cancel()}
+function showReadVocab(i){
+ const a=articleFor(activeTitle),v=a&&a.vocab&&a.vocab[i];if(!v)return;readerAuto=false;
+ const card=document.getElementById("readVocabCard");if(card)card.innerHTML=`<div class="rvword"><span class="rvmark">${esc(v.mark||"")}</span>${esc(v.word)}</div><div class="pos">${esc(v.pos||"")}</div><div class="zh">${esc(v.zh||"")}</div><button class="speak" style="margin:10px 0 0" onclick="say('${esc(v.word).replace(/'/g,"\\'")}',.9)">🔊 發音</button><div class="hint" style="margin-top:10px">★ G4 建議要會 ｜ ○ 閱讀認得即可 ｜ ◆ 專有名詞</div>`;
+ say(v.word,.9);
 }
 function renderVocab(){
  const p=pool(),gs=page==="reading"?groupsFor(activeTitle):[activeTitle];const b=document.getElementById("modeBody");
@@ -102,6 +159,14 @@ function drawQ(){
 function ans(btn,target){if(document.querySelector(".choice.correct,.choice.wrong"))return;answered++;document.querySelectorAll(".choice").forEach(x=>{if(x.dataset.w===target)x.classList.add("correct")});if(btn.dataset.w===target){correct++;fb.textContent="✅ Correct!"}else{btn.classList.add("wrong");fb.textContent="❌ 正確答案是 "+target}setTimeout(()=>{qi++;drawQ()},700)}
 let voice=null;function loadV(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>/samantha/i.test(v.name))||vs.find(v=>/^en-US$/i.test(v.lang||""))||vs.find(v=>(v.lang||"").startsWith("en"))}if("speechSynthesis"in window){loadV();speechSynthesis.onvoiceschanged=loadV}
 function say(t,r){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=r;if(voice)u.voice=voice;speechSynthesis.speak(u)}
-document.querySelectorAll(".top").forEach(b=>b.onclick=()=>{document.querySelectorAll(".top").forEach(x=>x.classList.remove("active"));b.classList.add("active");page=b.dataset.page;renderHome()});
-fetch("./vocabulary.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{words=d;renderHome()}).catch(()=>home.innerHTML='<div class="panel">資料載入失敗，請重新整理。</div>');
+async function loadReadingData(){
+ const parts=await Promise.all(Array.from({length:8},(_,i)=>fetch("./reading/chunk"+String(i).padStart(2,"0")+".txt",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("reading chunk");return r.text()})));
+ const bin=Uint8Array.from(atob(parts.join("").trim()),c=>c.charCodeAt(0));
+ if(!("DecompressionStream"in window))throw new Error("Browser does not support gzip reader data");
+ const ds=new DecompressionStream("gzip");
+ const txt=await new Response(new Blob([bin]).stream().pipeThrough(ds)).text();
+ return JSON.parse(txt);
+}
+document.querySelectorAll(".top").forEach(b=>b.onclick=()=>{stopReading();document.querySelectorAll(".top").forEach(x=>x.classList.remove("active"));b.classList.add("active");page=b.dataset.page;renderHome()});
+Promise.all([fetch("./vocabulary.json",{cache:"no-store"}).then(r=>r.json()),loadReadingData().catch(()=>[])]).then(([d,r])=>{words=d;readings=r;renderHome()}).catch(()=>home.innerHTML='<div class="panel">資料載入失敗，請重新整理。</div>');
 </script></body></html>
