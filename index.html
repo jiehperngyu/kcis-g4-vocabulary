@@ -21,7 +21,7 @@ button{border:0;border-radius:999px;padding:10px 15px;background:#fff;color:var(
 @media(max-width:720px){.vocab{grid-template-columns:1fr}.choices{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <header><h1>KCIS G4 Learning</h1><p>Reading：課文 × Vocabulary × Quiz　｜　ESL Vocabulary Practice</p></header>
-<nav class="tabs"><button class="top active" data-page="reading">📚 Reading</button><button class="top" data-page="esl">✏️ ESL</button></nav>
+<nav class="tabs"><button class="top active" data-page="reading">📚 Reading</button><button class="top" data-page="esl">✏️ ESL</button><button class="top" data-page="quiz">🎯 Quiz</button></nav>
 <section id="home"></section><section id="study" class="hidden"></section>
 </div><script>
 let words=[],page="reading",activeTitle="",activeMode="vocab",quizSet=[],qi=0,correct=0,answered=0;
@@ -33,14 +33,44 @@ function readingTitles(){return [...new Set(words.filter(w=>!isESL(w.group)).map
 function groupsFor(t){return [...new Set(words.filter(w=>base(w.group)===t).map(w=>w.group))]}
 function renderHome(){
  const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
- if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','quiz')">🎯 Quiz</button></div></article>`).join("")+'</div>'}
- else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','quiz')">🎯 Quiz</button></div></article>`).join("")+'</div>'}
+ if(page==="quiz"){renderQuizHome();return}\n if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
+ else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
+}
+
+function renderQuizHome(){
+ const reading=readingTitles(), esl=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];
+ document.getElementById("home").innerHTML=`
+ <div class="panel">
+   <div class="mode-title">🎯 Quiz</div>
+   <div class="hint">可跨文章選擇測驗範圍；Reading 可進一步選 P1、P2、Skills Vocab。</div>
+   <div class="esl-head">📚 Reading</div>
+   <div id="qReading">${reading.map(t=>`<div class="unit" style="margin-bottom:10px"><label style="font-weight:900"><input type="checkbox" class="qtitle" data-title="${esc(t)}"> ${esc(t)}</label><div style="margin:9px 0 0 24px;display:flex;gap:12px;flex-wrap:wrap">${groupsFor(t).map(g=>`<label><input type="checkbox" class="qgroup" value="${esc(g)}" data-parent="${esc(t)}"> ${esc(g.replace(t+"-",""))}</label>`).join("")}</div></div>`).join("")}</div>
+   <div class="esl-head" style="margin-top:18px">✏️ ESL</div>
+   <div style="display:flex;gap:14px;flex-wrap:wrap">${esl.map(g=>`<label><input type="checkbox" class="qgroup" value="${esc(g)}"> ${esc(g)}</label>`).join("")}</div>
+   <div style="margin-top:20px"><button class="primary" id="globalStart">開始測驗</button></div>
+ </div><div id="globalQuiz"></div>`;
+ document.querySelectorAll(".qtitle").forEach(cb=>cb.addEventListener("change",()=>{document.querySelectorAll('.qgroup[data-parent="'+CSS.escape(cb.dataset.title)+'"]').forEach(x=>x.checked=cb.checked)}));
+ document.getElementById("globalStart").onclick=startGlobalQuiz;
+}
+function startGlobalQuiz(){
+ const gs=[...document.querySelectorAll(".qgroup:checked")].map(x=>x.value);
+ const p=words.filter(w=>gs.includes(w.group));
+ if(p.length<4){alert("請至少選擇合計 4 個以上的單字。");return}
+ quizSet=[...p].sort(()=>Math.random()-.5);qi=correct=answered=0;drawGlobalQ();
+}
+function drawGlobalQ(){
+ const root=document.getElementById("globalQuiz");
+ if(qi>=quizSet.length){root.innerHTML=`<div class="panel quiz"><div class="question">🎉 完成！</div><div class="score">Final Score: ${correct} / ${answered}</div><br><button class="primary" onclick="renderQuizHome()">重新選擇範圍</button></div>`;return}
+ const w=quizSet[qi], chosenGroups=[...document.querySelectorAll(".qgroup:checked")].map(x=>x.value),p=words.filter(x=>chosenGroups.includes(x.group));
+ const wrong=p.filter(x=>x.word!==w.word).sort(()=>Math.random()-.5).slice(0,3),cs=[w,...wrong].sort(()=>Math.random()-.5);
+ root.innerHTML=`<div class="panel quiz"><div class="score">Score: ${correct} / ${answered}　 Question ${qi+1} / ${quizSet.length}</div><div class="question">Which word means “${esc(w.en)}”?</div><div class="choices">${cs.map(c=>`<button class="choice" data-w="${esc(c.word)}">${esc(c.word)}</button>`).join("")}</div><div id="gfb" style="margin-top:12px;font-weight:900"></div></div>`;
+ root.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>{if(root.querySelector(".choice.correct,.choice.wrong"))return;answered++;root.querySelectorAll(".choice").forEach(x=>{if(x.dataset.w===w.word)x.classList.add("correct")});if(btn.dataset.w===w.word){correct++;document.getElementById("gfb").textContent="✅ Correct!"}else{btn.classList.add("wrong");document.getElementById("gfb").textContent="❌ 正確答案是 "+w.word}setTimeout(()=>{qi++;drawGlobalQ()},700)});
 }
 function openUnit(t,m){activeTitle=t;activeMode=m;showStudy()} function openESL(g,m){activeTitle=g;activeMode=m;showStudy()}
 function pool(){return page==="reading"?words.filter(w=>base(w.group)===activeTitle):words.filter(w=>w.group===activeTitle)}
 function showStudy(){
  document.getElementById("home").classList.add("hidden");const s=document.getElementById("study");s.classList.remove("hidden");
- const modes=page==="reading"?["read","vocab","quiz"]:["vocab","quiz"];
+ const modes=page==="reading"?["read","vocab"]:["vocab"];
  s.innerHTML=`<button class="back" onclick="renderHome()">← 回到${page==="reading"?" Reading Library":" ESL"}</button><div class="mode-title">${esc(activeTitle)}</div><div class="subtabs">${modes.map(m=>`<button class="${m===activeMode?"active":""}" onclick="switchMode('${m}')">${m==="read"?"📖 Read":m==="vocab"?"📝 Vocabulary":"🎯 Quiz"}</button>`).join("")}</div><div id="modeBody"></div>`;
  renderMode();
 }
