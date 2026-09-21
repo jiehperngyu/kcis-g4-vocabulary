@@ -46,6 +46,7 @@ function practiceTitle(t){return titleAliases[t]||t}
 function readingTitles(){return readings.length?readings.map(a=>a.title):[...new Set(words.filter(w=>!isESL(w.group)).map(w=>base(w.group)))]}
 function groupsFor(t){const pt=practiceTitle(t);return [...new Set(words.filter(w=>base(w.group)===pt).map(w=>w.group))]}
 function articleFor(t){return readings.find(a=>a.title===t)}
+function groupLabel(g,t){const pt=practiceTitle(t);return g.indexOf(pt+"-")===0?g.slice(pt.length+1):g}
 function renderHome(){
  const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
  if(page==="quiz"){renderQuizHome();return}
@@ -60,7 +61,7 @@ function renderQuizHome(){
    <div class="mode-title">🎯 Quiz</div>
    <div class="hint">可跨文章選擇測驗範圍；Reading 可進一步選 P1、P2、Skills Vocab。</div>
    <div class="esl-head">📚 Reading</div>
-   <div id="qReading">${reading.map(t=>`<div class="unit" style="margin-bottom:10px"><label style="font-weight:900"><input type="checkbox" class="qtitle" data-title="${esc(t)}"> ${esc(t)}</label><div style="margin:9px 0 0 24px;display:flex;gap:12px;flex-wrap:wrap">${groupsFor(t).map(g=>`<label><input type="checkbox" class="qgroup" value="${esc(g)}" data-parent="${esc(t)}"> ${esc(g.replace(t+"-",""))}</label>`).join("")}</div></div>`).join("")}</div>
+   <div id="qReading">${reading.map(t=>`<div class="unit" style="margin-bottom:10px"><label style="font-weight:900"><input type="checkbox" class="qtitle" data-title="${esc(t)}"> ${esc(t)}</label><div style="margin:9px 0 0 24px;display:flex;gap:12px;flex-wrap:wrap">${groupsFor(t).map(g=>`<label><input type="checkbox" class="qgroup" value="${esc(g)}" data-parent="${esc(t)}"> ${esc(groupLabel(g,t))}</label>`).join("")}</div></div>`).join("")}</div>
    <div class="esl-head" style="margin-top:18px">✏️ ESL</div>
    <div style="display:flex;gap:14px;flex-wrap:wrap">${esl.map(g=>`<label><input type="checkbox" class="qgroup" value="${esc(g)}"> ${esc(g)}</label>`).join("")}</div>
    <div style="margin-top:20px"><button class="primary" id="globalStart">開始測驗</button></div>
@@ -86,7 +87,7 @@ function openUnit(t,m){activeTitle=t;activeMode=m;showStudy()} function openESL(
 function pool(){return page==="reading"?words.filter(w=>base(w.group)===practiceTitle(activeTitle)):words.filter(w=>w.group===activeTitle)}
 function showStudy(){
  document.getElementById("home").classList.add("hidden");const s=document.getElementById("study");s.classList.remove("hidden");
- const modes=page==="reading"?["read","vocab"]:["vocab"];
+ const modes=page==="reading"?(groupsFor(activeTitle).length?["read","vocab"]:["read"]):["vocab"];
  s.innerHTML=`<button class="back" onclick="renderHome()">← 回到${page==="reading"?" Reading Library":" ESL"}</button><div class="mode-title">${esc(activeTitle)}</div><div class="subtabs">${modes.map(m=>`<button class="${m===activeMode?"active":""}" onclick="switchMode('${m}')">${m==="read"?"📖 Read":m==="vocab"?"📝 Vocabulary":"🎯 Quiz"}</button>`).join("")}</div><div id="modeBody"></div>`;
  renderMode();
 }
@@ -140,7 +141,7 @@ function showReadVocab(i){
 }
 function renderVocab(){
  const p=pool(),gs=page==="reading"?groupsFor(activeTitle):[activeTitle];const b=document.getElementById("modeBody");
- b.innerHTML=(page==="reading"?`<div class="filters"><button class="active" onclick="drawVocab('all',this)">全部 ${p.length}</button>${gs.map(g=>`<button onclick="drawVocab('${esc(g).replace(/'/g,"\\'")}',this)">${esc(g.replace(activeTitle+"-",""))}</button>`).join("")}</div>`:"")+'<div id="vlist" class="vocab-list"></div>';
+ b.innerHTML=(page==="reading"?`<div class="filters"><button class="active" onclick="drawVocab('all',this)">全部 ${p.length}</button>${gs.map(g=>`<button onclick="drawVocab('${esc(g).replace(/'/g,"\\'")}',this)">${esc(groupLabel(g,activeTitle))}</button>`).join("")}</div>`:"")+'<div id="vlist" class="vocab-list"></div>';
  drawVocab("all");
 }
 function drawVocab(g,btn){
