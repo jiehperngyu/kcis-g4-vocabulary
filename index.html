@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KCIS G4 Learning</title>\n<!-- deploy refresh 2026-09-21 -->
+<title>KCIS G4 Learning</title>
+<!-- deploy refresh 2026-09-21 -->
 <style>
 :root{--bg:#f4f8fc;--paper:#fff;--ink:#203044;--muted:#6d7b8a;--blue:#3f78ad;--dark:#2d5f8f;--pale:#dceaf6;--line:#dce5ee;--shadow:0 8px 22px rgba(36,49,58,.08)}
 *{box-sizing:border-box}body{margin:0;font-family:ui-rounded,"SF Pro Rounded","PingFang TC",system-ui,sans-serif;background:linear-gradient(#f8fbff,#edf4fa);color:var(--ink)}
@@ -47,7 +48,8 @@ function groupsFor(t){const pt=practiceTitle(t);return [...new Set(words.filter(
 function articleFor(t){return readings.find(a=>a.title===t)}
 function renderHome(){
  const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
- if(page==="quiz"){renderQuizHome();return}\n if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button>${groupsFor(t).length?`<button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button>`:""}</div></article>`).join("")+'</div>'}
+ if(page==="quiz"){renderQuizHome();return}
+ if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button>${groupsFor(t).length?`<button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button>`:""}</div></article>`).join("")+'</div>'}
  else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
 }
 
@@ -92,10 +94,7 @@ function switchMode(m){stopReading();activeMode=m;showStudy()}
 function renderMode(){
  if(activeMode==="vocab")renderVocab();else if(activeMode==="quiz")startQuiz();else renderRead();
 }
-function rx(s){return String(s).replace(/[.*+?^$\{\}()|[\]\\]/g,"\\function renderRead(){
- const b=document.getElementById("modeBody");
- b.innerHTML=`<div class="read-note"><b>📖 課文閱讀模式</b><br>這篇文章的 Vocabulary 已經與同一個 Reading unit 整合。完整課文與逐段朗讀資料正在從原 Reading Library 移入同一個資料來源；在完成資料搬移前，Vocabulary 與 Quiz 已先依文章整合，不會建立第二套重複單字。</div>`;
-}")}
+function rx(s){var specials="^$.*+?()[]{}|";return String(s).split("").map(function(ch){return specials.indexOf(ch)>=0?String.fromCharCode(92)+ch:ch}).join("")}
 function markedParagraph(text,vocab){
  if(!vocab||!vocab.length)return esc(text);
  const map=new Map(vocab.map((v,i)=>[String(v.word).toLowerCase(),i]));
