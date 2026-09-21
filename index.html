@@ -1,563 +1,77 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>KCIS G4 Vocabulary Practice</title>
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KCIS G4 Learning</title>
 <style>
-:root {
-  --bg:#f3f7fb;
-  --paper:#ffffff;
-  --ink:#203044;
-  --muted:#6d7b8a;
-  --accent:#3f78ad;
-  --accent-dark:#2d5f8f;
-  --accent2:#dceaf6;
-  --line:#dce5ee;
-  --danger:#b95f5f;
-  --ok:#4d8a63;
-  --shadow:0 8px 22px rgba(36,49,58,.08);
-  --radius:18px;
+:root{--bg:#f4f8fc;--paper:#fff;--ink:#203044;--muted:#6d7b8a;--blue:#3f78ad;--dark:#2d5f8f;--pale:#dceaf6;--line:#dce5ee;--shadow:0 8px 22px rgba(36,49,58,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:ui-rounded,"SF Pro Rounded","PingFang TC",system-ui,sans-serif;background:linear-gradient(#f8fbff,#edf4fa);color:var(--ink)}
+.wrap{max-width:1180px;margin:auto;padding:24px 18px 60px}header{background:linear-gradient(135deg,#315f8c,#5d91c2);color:#fff;border-radius:26px;padding:25px 28px;box-shadow:var(--shadow)}
+h1{margin:0;font-size:clamp(30px,5vw,46px)}header p{margin:7px 0 0;opacity:.92}.tabs,.subtabs,.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:17px 0}
+button{border:0;border-radius:999px;padding:10px 15px;background:#fff;color:var(--ink);font-weight:800;cursor:pointer;box-shadow:0 3px 10px #00000012}button.active,.primary{background:var(--blue);color:#fff}
+.library{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.unit{background:#fff;border:1px solid #315f8c1a;border-radius:18px;padding:17px;box-shadow:var(--shadow)}
+.unit h3{margin:0 0 12px;font-size:18px}.unit-actions{display:flex;gap:7px;flex-wrap:wrap}.unit-actions button{font-size:13px;padding:8px 11px;background:#eef5fb;color:var(--dark)}
+.unit-actions button.active{background:var(--blue);color:#fff}.panel{background:#fff;border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-top:14px}.hidden{display:none!important}
+.back{margin-bottom:12px}.mode-title{font-size:26px;font-weight:900;margin:5px 0 4px}.hint{color:var(--muted);font-size:14px;margin-bottom:14px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.filters button{font-size:13px;background:#eef5fb}.filters button.active{background:var(--blue);color:#fff}
+.vocab-list{display:grid;gap:11px}.vocab{display:grid;grid-template-columns:minmax(220px,30%) 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.wordside{padding:16px;background:#f3f8fd}.word{font-size:26px;font-weight:900}.pos{font-size:13px;color:var(--muted)}.zh{font-size:17px;color:var(--dark);font-weight:800;margin-top:4px}
+.detail{padding:15px;line-height:1.55}.example{background:#f5f8fb;padding:10px;border-radius:11px;margin-top:8px}.tag{font-size:11px;background:var(--pale);display:inline-block;padding:4px 7px;border-radius:999px;margin-bottom:7px}
+.speak{padding:5px 8px;margin-left:6px;box-shadow:none;background:var(--pale)}.quiz{max-width:850px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{text-align:left;border:2px solid var(--line)}
+.correct{background:#edf7f0!important;border-color:#4d8a63!important}.wrong{background:#fbefef!important;border-color:#b95f5f!important}.question{font-size:22px;font-weight:900;margin:16px 0}.score{font-weight:900;color:var(--dark)}
+.read-note{padding:22px;background:#fff8dc;border-radius:16px;line-height:1.7}.esl-head{font-size:20px;font-weight:900;margin-bottom:12px}
+@media(max-width:720px){.vocab{grid-template-columns:1fr}.choices{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<header><h1>KCIS G4 Learning</h1><p>Reading：課文 × Vocabulary × Quiz　｜　ESL Vocabulary Practice</p></header>
+<nav class="tabs"><button class="top active" data-page="reading">📚 Reading</button><button class="top" data-page="esl">✏️ ESL</button></nav>
+<section id="home"></section><section id="study" class="hidden"></section>
+</div><script>
+let words=[],page="reading",activeTitle="",activeMode="vocab",quizSet=[],qi=0,correct=0,answered=0;
+const titleAliases={"From Minn of the Mississippi":"from Minn of the Mississippi","from Butterfly Eyes and Other Secrets of the Meadow":"from Butterfly Eyes","Feathers, Not Just for Flying":"Feathers, Not just for fling"};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function base(g){return g.replace(/-skills vocab$/,"").replace(/-P[12]$/,"")}
+function isESL(g){return g.startsWith("ESL2 Lesson")}
+function readingTitles(){return [...new Set(words.filter(w=>!isESL(w.group)).map(w=>base(w.group)))]}
+function groupsFor(t){return [...new Set(words.filter(w=>base(w.group)===t).map(w=>w.group))]}
+function renderHome(){
+ const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
+ if(page==="reading"){h.innerHTML='<div class="library">'+readingTitles().map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','quiz')">🎯 Quiz</button></div></article>`).join("")+'</div>'}
+ else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','quiz')">🎯 Quiz</button></div></article>`).join("")+'</div>'}
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:ui-rounded,"SF Pro Rounded","PingFang TC","Noto Sans TC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:linear-gradient(180deg,#f7fbff 0%,#edf4fa 100%);
-  color:var(--ink);
-  min-height:100vh;
+function openUnit(t,m){activeTitle=t;activeMode=m;showStudy()} function openESL(g,m){activeTitle=g;activeMode=m;showStudy()}
+function pool(){return page==="reading"?words.filter(w=>base(w.group)===activeTitle):words.filter(w=>w.group===activeTitle)}
+function showStudy(){
+ document.getElementById("home").classList.add("hidden");const s=document.getElementById("study");s.classList.remove("hidden");
+ const modes=page==="reading"?["read","vocab","quiz"]:["vocab","quiz"];
+ s.innerHTML=`<button class="back" onclick="renderHome()">← 回到${page==="reading"?" Reading Library":" ESL"}</button><div class="mode-title">${esc(activeTitle)}</div><div class="subtabs">${modes.map(m=>`<button class="${m===activeMode?"active":""}" onclick="switchMode('${m}')">${m==="read"?"📖 Read":m==="vocab"?"📝 Vocabulary":"🎯 Quiz"}</button>`).join("")}</div><div id="modeBody"></div>`;
+ renderMode();
 }
-.wrap{max-width:1180px;margin:0 auto;padding:26px 18px 56px}
-header{
-  background:linear-gradient(135deg,#315f8c,#5d91c2);
-  color:#fff;
-  border-radius:26px;
-  padding:26px 28px;
-  box-shadow:var(--shadow);
+function switchMode(m){activeMode=m;showStudy()}
+function renderMode(){
+ if(activeMode==="vocab")renderVocab();else if(activeMode==="quiz")startQuiz();else renderRead();
 }
-h1{margin:0;font-size:clamp(30px,5vw,48px);line-height:1.05}
-.subtitle{margin-top:8px;font-size:16px;opacity:.92}
-.toolbar{
-  margin:18px 0;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
+function renderRead(){
+ const b=document.getElementById("modeBody");
+ b.innerHTML=`<div class="read-note"><b>📖 課文閱讀模式</b><br>這篇文章的 Vocabulary 已經與同一個 Reading unit 整合。完整課文與逐段朗讀資料正在從原 Reading Library 移入同一個資料來源；在完成資料搬移前，Vocabulary 與 Quiz 已先依文章整合，不會建立第二套重複單字。</div>`;
 }
-.page-tabs{display:flex;gap:10px;margin:18px 0 12px;flex-wrap:wrap}
-.page-tab{background:#dceaf6;color:var(--accent-dark);font-weight:850}
-.page-tab.active{background:var(--accent);color:#fff}
-.filter-panel{
-  margin:18px 0;
-  background:rgba(255,255,255,.82);
-  border:1px solid rgba(49,95,140,.12);
-  border-radius:20px;
-  padding:16px;
-  box-shadow:var(--shadow);
+function renderVocab(){
+ const p=pool(),gs=page==="reading"?groupsFor(activeTitle):[activeTitle];const b=document.getElementById("modeBody");
+ b.innerHTML=(page==="reading"?`<div class="filters"><button class="active" onclick="drawVocab('all',this)">全部 ${p.length}</button>${gs.map(g=>`<button onclick="drawVocab('${esc(g).replace(/'/g,"\\'")}',this)">${esc(g.replace(activeTitle+"-",""))}</button>`).join("")}</div>`:"")+'<div id="vlist" class="vocab-list"></div>';
+ drawVocab("all");
 }
-.filter-panel-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
+function drawVocab(g,btn){
+ if(btn){document.querySelectorAll(".filters button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
+ const p=pool().filter(w=>g==="all"||w.group===g),root=document.getElementById("vlist");
+ root.innerHTML=p.map(w=>`<article class="vocab"><div class="wordside"><div class="tag">${esc(w.group)}</div><div><span class="word">${esc(w.word)}</span><button class="speak" data-t="${esc(w.word)}" onclick="say(this.dataset.t,.9)">🔊</button></div><div class="pos">${esc(w.pos)}</div><div class="zh">${esc(w.zh)}</div></div><div class="detail"><b>English:</b> ${esc(w.en)} <button class="speak" data-t="${esc(w.en)}" onclick="say(this.dataset.t,.85)">🔊</button><div class="example"><b>Example:</b> ${esc(w.example)} <button class="speak" data-t="${esc(w.example)}" onclick="say(this.dataset.t,.85)">🔊</button><br><b>中文：</b>${esc(w.exzh)}</div></div></article>`).join("");
 }
-.filter-title{font-weight:900;font-size:18px;color:var(--accent-dark)}
-.lesson-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:10px;
+function startQuiz(){quizSet=[...pool()].sort(()=>Math.random()-.5);qi=correct=answered=0;drawQ()}
+function drawQ(){
+ const b=document.getElementById("modeBody");if(!quizSet.length){b.innerHTML="<p>這個分類目前沒有 Quiz 單字。</p>";return}
+ if(qi>=quizSet.length){b.innerHTML=`<div class="panel quiz"><div class="question">🎉 完成！</div><div class="score">Final Score: ${correct} / ${answered}</div><br><button class="primary" onclick="startQuiz()">再測一次</button></div>`;return}
+ const w=quizSet[qi],all=pool(),wrong=all.filter(x=>x.word!==w.word).sort(()=>Math.random()-.5).slice(0,3),cs=[w,...wrong].sort(()=>Math.random()-.5);
+ b.innerHTML=`<div class="panel quiz"><div class="score">Score: ${correct} / ${answered}　 Question ${qi+1} / ${quizSet.length}</div><div class="question">Which word means “${esc(w.en)}”?</div><div class="choices">${cs.map(c=>`<button class="choice" data-w="${esc(c.word)}" onclick="ans(this,'${esc(w.word).replace(/'/g,"\\'")}')">${esc(c.word)}</button>`).join("")}</div><div id="fb"></div></div>`;
 }
-.lesson-card{
-  border:1px solid var(--line);
-  background:#f8fbfe;
-  border-radius:14px;
-  padding:11px 12px;
-}
-.lesson-name{
-  font-weight:900;
-  color:var(--ink);
-  font-size:14px;
-  margin-bottom:8px;
-}
-.lesson-buttons{display:flex;flex-wrap:wrap;gap:7px}
-.filter-panel .filter-btn{
-  padding:8px 11px;
-  font-size:13px;
-  line-height:1.25;
-  text-align:left;
-}
-.filter-panel .all-filter{font-size:14px;padding:9px 14px}
-button,.filter-btn{
-  border:none;
-  border-radius:999px;
-  padding:10px 15px;
-  font-size:15px;
-  cursor:pointer;
-  transition:.18s ease;
-  background:#fff;
-  color:var(--ink);
-  box-shadow:0 3px 10px rgba(0,0,0,.07);
-}
-button:hover,.filter-btn:hover{transform:translateY(-1px)}
-.filter-btn.active,.scope-btn.active{background:var(--accent);color:#fff}
-.mode-btn{background:#fff2c9}
-.count{color:var(--muted);font-weight:700;margin-left:auto}
-.vocab-list{display:flex;flex-direction:column;gap:12px}
-.vocab-row{
-  display:grid;
-  grid-template-columns:minmax(220px,30%) 1fr;
-  background:var(--paper);
-  border:1px solid rgba(49,95,140,.10);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-.word-side{
-  padding:18px 20px;
-  background:linear-gradient(180deg,#f6faff,#eef5fb);
-  border-right:1px solid var(--line);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:7px;
-}
-.word-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.word{font-size:28px;font-weight:850;letter-spacing:.2px}
-.pos{font-size:13px;color:var(--muted);font-weight:800;text-transform:lowercase}
-.zh{font-size:18px;font-weight:800;color:var(--accent-dark)}
-.group-tag{
-  display:inline-block;
-  width:max-content;
-  max-width:100%;
-  font-size:12px;
-  color:var(--accent-dark);
-  background:var(--accent2);
-  padding:4px 8px;
-  border-radius:999px;
-  font-weight:800;
-}
-.detail-side{padding:16px 20px;display:grid;gap:12px;align-content:center}
-.detail-block{line-height:1.55}
-.label{font-weight:850}
-.example-block{background:#f4f8fc;border-radius:12px;padding:11px 13px}
-.speak{
-  width:38px;height:38px;border-radius:50%;padding:0;
-  display:grid;place-items:center;background:var(--accent2);
-  box-shadow:none;font-size:17px;flex:0 0 auto;
-}
-.speak-inline{
-  width:29px;height:29px;border-radius:50%;padding:0;
-  display:inline-grid;place-items:center;background:var(--accent2);
-  box-shadow:none;font-size:13px;vertical-align:middle;margin-left:6px;
-}
-.hidden{display:none !important}
-.quiz-panel{
-  background:var(--paper);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:22px;
-  margin-top:16px;
-}
-.quiz-setup{display:grid;gap:16px}
-.scope-row{display:flex;flex-wrap:wrap;gap:9px}
-.scope-options{
-  background:#f4f8fc;border:1px solid var(--line);border-radius:14px;
-  padding:14px;display:grid;gap:9px;
-}
-.scope-options label{display:flex;align-items:center;gap:8px;font-weight:700}
-.start-quiz{background:var(--accent);color:#fff;width:max-content}
-.quiz-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
-.score{background:#edf4fa;border-radius:14px;padding:10px 13px;display:inline-block;font-weight:850}
-.progress{color:var(--muted);font-weight:800}
-.question{font-size:23px;font-weight:850;line-height:1.4;margin:12px 0 18px}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.choice{
-  background:#fff;border:2px solid #e3eaf0;box-shadow:none;border-radius:13px;
-  text-align:left;padding:13px 15px;font-size:17px;font-weight:800;
-}
-.choice.correct{border-color:var(--ok);background:#edf7f0}
-.choice.wrong{border-color:var(--danger);background:#fbefef}
-.feedback{margin-top:13px;font-size:18px;font-weight:850}
-.next{margin-top:13px;background:var(--accent);color:#fff}
-footer{color:var(--muted);text-align:center;margin-top:26px;font-size:13px}
-@media(max-width:760px){
-  .lesson-grid{grid-template-columns:1fr}
-  .filter-panel{padding:13px}
-  .vocab-row{grid-template-columns:1fr}
-  .word-side{border-right:none;border-bottom:1px solid var(--line)}
-  .choices{grid-template-columns:1fr}
-  .count{width:100%;margin-left:0}
-}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header>
-  <h1>KCIS G4 Vocabulary Practice</h1>
-  <div class="subtitle">Samantha 美式發音 • 中英解釋 • 例句 • 分類練習 • Quiz</div>
-</header>
-
-<nav class="page-tabs" aria-label="學習分頁">
-  <button class="page-tab active" data-page="reading">📚 Reading Vocabulary</button>
-  <button class="page-tab" data-page="esl">✏️ ESL Vocabulary</button>
-</nav>
-
-<div class="filter-panel" id="filterBar"></div>
-<div class="toolbar">
-  <button class="mode-btn" id="quizBtn">🎯 Quiz 模式</button>
-  <button id="shuffleBtn">🔀 隨機排列</button>
-  <div class="count" id="wordCount"></div>
-</div>
-
-<section id="cards" class="vocab-list"></section>
-
-<section id="quiz" class="quiz-panel hidden">
-  <div id="quizSetup" class="quiz-setup">
-    <div>
-      <div class="label">選擇測驗範圍</div>
-      <div class="scope-row" style="margin-top:10px">
-        <button class="scope-btn active" data-mode="all">全部</button>
-        <button class="scope-btn" data-mode="single">單一分類</button>
-        <button class="scope-btn" data-mode="multi">多選分類</button>
-      </div>
-    </div>
-    <div id="scopeOptions" class="scope-options hidden"></div>
-    <button class="start-quiz" id="startQuizBtn">開始測驗</button>
-  </div>
-
-  <div id="quizPlay" class="hidden">
-    <div class="quiz-head">
-      <div class="score" id="score">Score: 0 / 0</div>
-      <div class="progress" id="progress"></div>
-    </div>
-    <div id="quizBody"></div>
-  </div>
-</section>
-
-<footer>🔊 單字速度 0.90；英文解釋與例句速度 0.85。優先使用 Mac Samantha (en-US)。</footer>
-</div>
-
-<script>
-let words = [];
-
-let currentGroup = "all";
-let currentPage = "reading";
-let displayWords = [...words];
-let quizMode = "all";
-let selectedQuizGroups = [];
-
-const groups = [];
-
-function escapeAttr(text){
-  return String(text)
-    .replace(/&/g,"&amp;")
-    .replace(/"/g,"&quot;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
-}
-
-function splitGroupLabel(group){
-  const suffixes = ["-skills vocab","-P1","-P2"];
-  for(const suffix of suffixes){
-    if(group.endsWith(suffix)){
-      return { lesson: group.slice(0,-suffix.length), suffix };
-    }
-  }
-  return { lesson: group, suffix: "" };
-}
-
-function isGroupOnCurrentPage(group){
-  const isEslGroup = group.startsWith("ESL2 Lesson");
-  return currentPage === "esl" ? isEslGroup : !isEslGroup;
-}
-
-function renderFilters(){
-  const bar = document.getElementById("filterBar");
-  const lessonMap = new Map();
-  const pageGroups = groups.filter(isGroupOnCurrentPage);
-  pageGroups.forEach(g => {
-    const {lesson} = splitGroupLabel(g);
-    if(!lessonMap.has(lesson)) lessonMap.set(lesson,[]);
-    lessonMap.get(lesson).push(g);
-  });
-
-  const cards = [...lessonMap.entries()].map(([lesson, lessonGroups]) => `
-    <div class="lesson-card">
-      <div class="lesson-name">${lesson}</div>
-      <div class="lesson-buttons">
-        ${lessonGroups.map(g => `<button class="filter-btn" data-group="${escapeAttr(g)}">${g}</button>`).join("")}
-      </div>
-    </div>
-  `).join("");
-
-  bar.innerHTML = `
-    <div class="filter-panel-head">
-      <div class="filter-title">📚 分類篩選</div>
-      <button class="filter-btn all-filter active" data-group="all">全部 ${words.filter(w => isGroupOnCurrentPage(w.group)).length} 字</button>
-    </div>
-    <div class="lesson-grid">${cards}</div>
-  `;
-
-  bar.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.addEventListener("click",() => {
-      bar.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      currentGroup = btn.dataset.group;
-      renderCards();
-    });
-  });
-}
-
-function renderCards(){
-  const pageWords = displayWords.filter(w => isGroupOnCurrentPage(w.group));
-  const shown = currentGroup === "all"
-    ? pageWords
-    : pageWords.filter(w => w.group === currentGroup);
-
-  document.getElementById("wordCount").textContent = `目前顯示 ${shown.length} 字`;
-  document.getElementById("cards").innerHTML = shown.map(w => `
-    <article class="vocab-row">
-      <div class="word-side">
-        <div class="group-tag">${w.group}</div>
-        <div class="word-line">
-          <div class="word">${w.word}</div>
-          <button class="speak" aria-label="播放 ${w.word} 發音" data-text="${escapeAttr(w.word)}" onclick="speakFromButton(this,0.90)">🔊</button>
-        </div>
-        <div class="pos">${w.pos}</div>
-        <div class="zh">${w.zh}</div>
-      </div>
-      <div class="detail-side">
-        <div class="detail-block">
-          <span class="label">English:</span> ${w.en}
-          <button class="speak-inline" aria-label="播放英文解釋" data-text="${escapeAttr(w.en)}" onclick="speakFromButton(this,0.85)">🔊</button>
-        </div>
-        <div class="example-block">
-          <div>
-            <span class="label">Example:</span> ${w.example}
-            <button class="speak-inline" aria-label="播放英文例句" data-text="${escapeAttr(w.example)}" onclick="speakFromButton(this,0.85)">🔊</button>
-          </div>
-          <div style="margin-top:5px"><span class="label">中文：</span>${w.exzh}</div>
-        </div>
-      </div>
-    </article>
-  `).join("");
-}
-
-document.querySelectorAll(".page-tab").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".page-tab").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    currentPage = btn.dataset.page;
-    currentGroup = "all";
-    document.getElementById("quiz").classList.add("hidden");
-    document.getElementById("cards").classList.remove("hidden");
-    document.getElementById("quizBtn").textContent = "🎯 Quiz 模式";
-    renderFilters();
-    renderCards();
-    renderScopeOptions();
-  });
-});
-
-let samanthaVoice = null;
-let fallbackUSVoice = null;
-
-function loadPreferredVoice(){
-  if(!("speechSynthesis" in window)) return;
-  const voices = speechSynthesis.getVoices();
-  samanthaVoice =
-    voices.find(v => /samantha/i.test(v.name) && /^en-US$/i.test(v.lang || "")) ||
-    voices.find(v => /samantha/i.test(v.name));
-  fallbackUSVoice =
-    voices.find(v => /^en-US$/i.test(v.lang || "")) ||
-    voices.find(v => (v.lang || "").toLowerCase().startsWith("en-us")) ||
-    voices.find(v => (v.lang || "").toLowerCase().startsWith("en"));
-}
-
-function speak(text, rate=0.90){
-  if(!("speechSynthesis" in window)){
-    alert("這個瀏覽器目前不支援語音播放。");
-    return;
-  }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US";
-  u.rate = rate;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  const voice = samanthaVoice || fallbackUSVoice;
-  if(voice) u.voice = voice;
-  speechSynthesis.speak(u);
-}
-
-function speakFromButton(btn,rate){
-  speak(btn.dataset.text,rate);
-}
-
-loadPreferredVoice();
-if("speechSynthesis" in window) speechSynthesis.onvoiceschanged = loadPreferredVoice;
-
-document.getElementById("shuffleBtn").addEventListener("click",()=>{
-  displayWords = [...displayWords].sort(()=>Math.random()-.5);
-  renderCards();
-});
-
-function renderScopeOptions(){
-  const box = document.getElementById("scopeOptions");
-  const availableGroups = groups.filter(isGroupOnCurrentPage);
-  if(quizMode === "all"){
-    box.classList.add("hidden");
-    selectedQuizGroups = [...availableGroups];
-    return;
-  }
-  box.classList.remove("hidden");
-  const inputType = quizMode === "single" ? "radio" : "checkbox";
-  box.innerHTML = availableGroups.map((g,i)=>`
-    <label>
-      <input type="${inputType}" name="quizGroup" value="${escapeAttr(g)}" ${quizMode==="single" && i===0 ? "checked" : ""}>
-      <span>${g}</span>
-    </label>
-  `).join("");
-  if(quizMode === "single") selectedQuizGroups = availableGroups.length ? [availableGroups[0]] : [];
-  else selectedQuizGroups = [];
-  box.querySelectorAll("input").forEach(input=>{
-    input.addEventListener("change",()=>{
-      if(quizMode === "single"){
-        selectedQuizGroups = [input.value];
-      } else {
-        selectedQuizGroups = [...box.querySelectorAll("input:checked")].map(x=>x.value);
-      }
-    });
-  });
-}
-
-document.querySelectorAll(".scope-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".scope-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    quizMode = btn.dataset.mode;
-    renderScopeOptions();
-  });
-});
-
-let qIndex=0, correct=0, answered=0, quizSet=[];
-
-function getQuizPool(){
-  if(quizMode === "all") return words.filter(w => isGroupOnCurrentPage(w.group));
-  return words.filter(w => selectedQuizGroups.includes(w.group));
-}
-
-function makeQuizSet(){
-  const pool = getQuizPool();
-  if(pool.length < 4){
-    alert("這個測驗範圍至少需要 4 個單字。");
-    return;
-  }
-  quizSet = [...pool].sort(()=>Math.random()-.5);
-  qIndex=0;correct=0;answered=0;
-  document.getElementById("quizSetup").classList.add("hidden");
-  document.getElementById("quizPlay").classList.remove("hidden");
-  updateScore();
-  renderQuestion();
-}
-
-function renderQuestion(){
-  const w = quizSet[qIndex];
-  const pool = getQuizPool();
-  const wrongPool = pool.length >= 4 ? pool : words;
-  const wrong = wrongPool.filter(x=>x.word!==w.word).sort(()=>Math.random()-.5).slice(0,3);
-  const choices = [w,...wrong].sort(()=>Math.random()-.5);
-  document.getElementById("progress").textContent = `Question ${qIndex+1} / ${quizSet.length}`;
-  document.getElementById("quizBody").innerHTML = `
-    <button class="speak" data-text="${escapeAttr(w.word)}" onclick="speakFromButton(this,0.90)">🔊</button>
-    <div class="question">Which word means “${w.en}”?</div>
-    <div class="choices">
-      ${choices.map(c=>`<button class="choice" data-word="${escapeAttr(c.word)}" onclick="answer(this,'${w.word.replace(/'/g,"\\'")}')">${c.word}</button>`).join("")}
-    </div>
-    <div class="feedback" id="feedback"></div>
-    <button class="next hidden" id="nextBtn" onclick="nextQuestion()">下一題 →</button>
-  `;
-}
-
-function answer(btn,target){
-  if(document.querySelector(".choice.correct") || document.querySelector(".choice.wrong")) return;
-  answered++;
-  document.querySelectorAll(".choice").forEach(b=>{
-    if(b.dataset.word===target) b.classList.add("correct");
-  });
-  if(btn.dataset.word===target){
-    correct++;
-    document.getElementById("feedback").textContent="✅ Correct!";
-  } else {
-    btn.classList.add("wrong");
-    document.getElementById("feedback").textContent=`❌ 正確答案是 “${target}”。`;
-  }
-  updateScore();
-  document.getElementById("nextBtn").classList.remove("hidden");
-}
-
-function nextQuestion(){
-  qIndex++;
-  if(qIndex>=quizSet.length){
-    document.getElementById("quizBody").innerHTML=`
-      <div class="question">🎉 完成！</div>
-      <div class="score">Final Score: ${correct} / ${answered}</div>
-      <p>${correct===answered ? "Perfect! 太棒了！" : "再練一次，你會記得更牢！"}</p>
-      <button class="next" onclick="restartQuizSetup()">重新選擇測驗範圍</button>
-    `;
-    document.getElementById("progress").textContent="";
-    return;
-  }
-  renderQuestion();
-}
-
-function updateScore(){
-  document.getElementById("score").textContent=`Score: ${correct} / ${answered}`;
-}
-
-function restartQuizSetup(){
-  document.getElementById("quizPlay").classList.add("hidden");
-  document.getElementById("quizSetup").classList.remove("hidden");
-}
-
-document.getElementById("startQuizBtn").addEventListener("click",()=>{
-  if(quizMode !== "all" && selectedQuizGroups.length===0){
-    alert("請先選擇至少一個分類。");
-    return;
-  }
-  makeQuizSet();
-});
-
-document.getElementById("quizBtn").addEventListener("click",()=>{
-  const cards = document.getElementById("cards");
-  const quiz = document.getElementById("quiz");
-  const filters = document.getElementById("filterBar");
-  cards.classList.toggle("hidden");
-  filters.classList.toggle("hidden");
-  quiz.classList.toggle("hidden");
-  const isQuiz = !quiz.classList.contains("hidden");
-  document.getElementById("quizBtn").textContent = isQuiz ? "📚 回到單字表" : "🎯 Quiz 模式";
-  if(isQuiz) restartQuizSetup();
-});
-
-async function loadVocabulary(){
-  try{
-    const response = await fetch("./vocabulary.json", { cache: "no-store" });
-    if(!response.ok) throw new Error("HTTP " + response.status);
-    words = await response.json();
-    groups.splice(0, groups.length, ...new Set(words.map(w => w.group)));
-    displayWords = [...words];
-    renderFilters();
-    renderCards();
-    renderScopeOptions();
-  } catch(error){
-    console.error("Vocabulary load failed:", error);
-    document.getElementById("cards").innerHTML = '<div class="quiz-panel">單字資料載入失敗，請重新整理頁面。</div>';
-  }
-}
-
-loadVocabulary();
-</script>
-</body>
-</html>
+function ans(btn,target){if(document.querySelector(".choice.correct,.choice.wrong"))return;answered++;document.querySelectorAll(".choice").forEach(x=>{if(x.dataset.w===target)x.classList.add("correct")});if(btn.dataset.w===target){correct++;fb.textContent="✅ Correct!"}else{btn.classList.add("wrong");fb.textContent="❌ 正確答案是 "+target}setTimeout(()=>{qi++;drawQ()},700)}
+let voice=null;function loadV(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>/samantha/i.test(v.name))||vs.find(v=>/^en-US$/i.test(v.lang||""))||vs.find(v=>(v.lang||"").startsWith("en"))}if("speechSynthesis"in window){loadV();speechSynthesis.onvoiceschanged=loadV}
+function say(t,r){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=r;if(voice)u.voice=voice;speechSynthesis.speak(u)}
+document.querySelectorAll(".top").forEach(b=>b.onclick=()=>{document.querySelectorAll(".top").forEach(x=>x.classList.remove("active"));b.classList.add("active");page=b.dataset.page;renderHome()});
+fetch("./vocabulary.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{words=d;renderHome()}).catch(()=>home.innerHTML='<div class="panel">資料載入失敗，請重新整理。</div>');
+</script></body></html>
