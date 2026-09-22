@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nature's Build-In Armor | Matt's G4 Learning Journey</title>
+<style>
+:root{--ink:#203044;--muted:#6d7b8a;--blue:#3f78ad;--dark:#2d5f8f;--pale:#dceaf6;--line:#dce5ee;--shadow:0 8px 22px rgba(36,49,58,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:ui-rounded,"SF Pro Rounded","PingFang TC",system-ui,sans-serif;background:linear-gradient(#f8fbff,#edf4fa);color:var(--ink)}
+.wrap{max-width:1120px;margin:auto;padding:24px 18px 80px}header{background:linear-gradient(135deg,#315f8c,#5d91c2);color:#fff;border-radius:24px;padding:22px 26px;box-shadow:var(--shadow)}
+h1{margin:0;font-size:clamp(28px,5vw,42px)}header p{margin:6px 0 0;opacity:.92}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+button,.home{border:0;border-radius:999px;padding:10px 15px;background:#fff;color:var(--ink);font-weight:800;cursor:pointer;box-shadow:0 3px 10px #00000012;text-decoration:none;display:inline-block}
+button.active{background:var(--blue);color:#fff}.hidden{display:none!important}
+.reading-shell{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start;padding-bottom:88px}
+.reading-text{background:#fff;border-radius:20px;padding:22px;box-shadow:var(--shadow);font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.8}
+.reading-text p{margin:0 0 20px}.read-vocab{color:#1769aa;font-weight:900;cursor:pointer;border-bottom:1px dotted #1769aa}
+.side{position:sticky;top:14px;background:#fff;border-radius:18px;padding:15px;box-shadow:var(--shadow);font-size:14px;line-height:1.55}
+.rvword{font-size:22px;font-weight:900;color:var(--dark)}.pos{color:var(--muted);font-size:13px}.zh{font-size:17px;color:var(--dark);font-weight:800;margin-top:4px}
+.reader-controls{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:30;display:flex;gap:7px;flex-wrap:wrap;justify-content:center;align-items:center;background:#ffffffee;backdrop-filter:blur(9px);padding:10px 12px;border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 28px #1f385333;max-width:calc(100vw - 24px)}
+.reader-controls button{padding:8px 11px;font-size:13px}.reader-controls select{border:1px solid var(--line);border-radius:999px;padding:8px;background:#fff;font-weight:700}
+.vlist{display:grid;gap:11px}.vocab{display:grid;grid-template-columns:minmax(220px,30%) 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.wordside{padding:16px;background:#f3f8fd}.word{font-size:25px;font-weight:900}.detail{padding:15px;line-height:1.55}.example{background:#f5f8fb;padding:10px;border-radius:11px;margin-top:8px}
+.speak{padding:5px 8px;margin-left:6px;background:var(--pale);box-shadow:none}.note{color:var(--muted);font-size:13px;margin-top:10px}
+@media(max-width:820px){.reading-shell{grid-template-columns:1fr}.side{position:static;order:-1}.vocab{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap">
+<header><h1>Nature's Build-In Armor</h1><p>Reading-短文</p></header>
+<div class="toolbar"><a class="home" href="./">← 回首頁</a><button id="readTab" class="active">📖 Read</button><button id="vocabTab">📝 Vocabulary</button></div>
+
+<section id="readPane">
+<div class="reading-shell">
+<div class="reading-text" id="readingText">
+<p data-i="0">Every wild animal <span class="read-vocab" data-w="relies">relies</span> on a <span class="read-vocab" data-w="unique">unique</span> <span class="read-vocab" data-w="survival">survival</span> <span class="read-vocab" data-w="system">system</span> to stay alive. These body parts and habits help <span class="read-vocab" data-w="creatures">creatures</span> <span class="read-vocab" data-w="navigate">navigate</span> challenging <span class="read-vocab" data-w="natural">natural</span> <span class="read-vocab" data-w="environments">environments</span>. <span class="read-vocab" data-w="consider">Consider</span> how a river otter <span class="read-vocab" data-w="glides">glides</span> smoothly through cold water while hunting for food. The <span class="read-vocab" data-w="curved">curved</span> <span class="read-vocab" data-w="contour">contour</span> of its body cuts through currents with very little <span class="read-vocab" data-w="effort">effort</span>.</p>
+<p data-i="1">To endure freezing rivers, the otter relies on special <span class="read-vocab" data-w="adaptations">adaptations</span>. Its skin is covered by tough, thick fur that <span class="read-vocab" data-w="resists">resists</span> wear and tear from <span class="read-vocab" data-w="rough">rough</span> <span class="read-vocab" data-w="riverbanks">riverbanks</span>. <span class="read-vocab" data-w="beneath">Beneath</span> those guard hairs rests a fluffy <span class="read-vocab" data-w="layer">layer</span> of underfur that traps warm air. Together, these fur layers completely waterproof against the icy stream.</p>
+<p data-i="2">Other animals rely on <span class="read-vocab" data-w="distinct">distinct</span> physical features to protect themselves and build homes. A threatened porcupine will <span class="read-vocab" data-w="raise">raise</span> the <span class="read-vocab" data-w="bristles">bristles</span> of its sharp quills to <span class="read-vocab" data-w="frighten">frighten</span> away predators. <span class="read-vocab" data-w="meanwhile">Meanwhile</span>, birds search for soft plant material to weave sturdy nests for their eggs. Every unique <span class="read-vocab" data-w="trait">trait</span> in nature serves a clear purpose for survival.</p>
+</div>
+<aside class="side" id="side"><b>Vocabulary</b><div class="note">點藍色單字可看中文與發音。</div></aside>
+</div>
+<div class="reader-controls">
+<button id="continueBtn">▶︎ 繼續朗讀</button><button id="restartBtn">↺ 從頭播放</button><button id="prevBtn">← 上一段</button><button id="currentBtn">🔊 本段</button><button id="nextBtn">下一段 →</button><button id="pauseBtn">⏸ Pause</button><button id="stopBtn">■ Stop</button>
+<select id="rate"><option value=".75">0.75×</option><option value=".85">0.85×</option><option value=".95" selected>0.95×</option><option value="1.05">1.05×</option><option value="1.15">1.15×</option></select>
+</div>
+</section>
+
+<section id="vocabPane" class="hidden"><div id="vlist" class="vlist"></div></section>
+</div>
+<script>
+const V=[
+["relies","verb","依靠；依賴","depends on someone or something for help or support","The otter relies on its fur to stay warm.","水獺依靠牠的毛皮保持溫暖。"],
+["unique","adjective","獨特的；獨一無二的","different from all others in a special way","Each animal has a unique way to survive.","每種動物都有獨特的生存方式。"],
+["survival","noun","生存；存活","the act of staying alive","Thick fur helps the otter's survival in cold water.","厚毛皮幫助水獺在冷水中生存。"],
+["system","noun","系統；體系","a group of connected parts that work together","The animal has a system that helps it stay alive.","這種動物有一套幫助牠生存的系統。"],
+["creatures","noun","生物；動物","living things, especially animals","Many creatures have special ways to protect themselves.","許多生物都有特殊的方法保護自己。"],
+["navigate","verb","穿越；在……中找到方向","to find a way through or around a place","Animals must navigate difficult environments.","動物必須在困難的環境中找到方向。"],
+["natural","adjective","自然的","found in nature and not made by people","The river is part of the otter's natural habitat.","河流是水獺自然棲息環境的一部分。"],
+["environments","noun","環境","the places and conditions in which living things live","Animals live in many different environments.","動物生活在許多不同的環境中。"],
+["consider","verb","想想看；考慮","to think carefully about something","Consider how the otter moves through the water.","想想看水獺如何在水中移動。"],
+["glides","verb","滑行；順暢移動","moves smoothly and easily","The otter glides through the cold water.","水獺順暢地滑過冰冷的水。"],
+["curved","adjective","彎曲的","having a bent or rounded shape","The otter has a curved body shape.","水獺的身體外形是彎曲流線的。"],
+["contour","noun","輪廓；外形","the outer shape or outline of something","The contour of its body helps it move through water.","牠身體的輪廓幫助牠在水中移動。"],
+["effort","noun","力氣；努力","the energy used to do something","The otter swims with very little effort.","水獺游泳時幾乎不用費力。"],
+["adaptations","noun","適應特徵；適應方式","features or behaviors that help a living thing survive","Thick fur is one of the otter's adaptations.","厚毛皮是水獺的適應特徵之一。"],
+["resists","verb","抵抗；耐受","stays strong against damage or pressure","The otter's fur resists wear and tear.","水獺的毛皮能耐受磨損。"],
+["rough","adjective","粗糙的；崎嶇的","not smooth; having an uneven surface","The otter may rub against rough rocks.","水獺可能會摩擦到粗糙的岩石。"],
+["riverbanks","noun","河岸","the land along the sides of a river","Otters often live near riverbanks.","水獺常住在河岸附近。"],
+["beneath","preposition","在……下面","under or below something","Warm underfur lies beneath the guard hairs.","保暖的底毛位在護毛下面。"],
+["layer","noun","層","one thickness of material covering something","The otter has a soft layer of underfur.","水獺有一層柔軟的底毛。"],
+["distinct","adjective","明顯不同的；獨特的","clearly different or easy to recognize","Each animal has distinct physical features.","每種動物都有明顯不同的身體特徵。"],
+["raise","verb","豎起；抬起","to lift or move something upward","A porcupine can raise its bristles.","豪豬可以豎起牠的硬毛。"],
+["bristles","noun","硬毛；剛毛","short, stiff hairs","The porcupine raises its bristles when threatened.","豪豬受到威脅時會豎起硬毛。"],
+["frighten","verb","使害怕；嚇走","to make someone or something feel afraid","Sharp quills can frighten predators away.","尖銳的刺可以把掠食者嚇走。"],
+["meanwhile","adverb","同時；另一方面","at the same time","The otter swims; meanwhile, birds build nests nearby.","水獺在游泳；同時，附近的鳥正在築巢。"],
+["trait","noun","特徵；特性","a particular quality or feature of a living thing","Every useful trait helps an animal survive.","每個有用的特徵都能幫助動物生存。"]
+];
+const M=Object.fromEntries(V.map(x=>[x[0],x]));
+let voice=null,idx=0,auto=false;
+function loadV(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>/samantha/i.test(v.name))||vs.find(v=>(v.lang||"").toLowerCase()==="en-us")||vs.find(v=>(v.lang||"").startsWith("en"))}
+if("speechSynthesis"in window){loadV();speechSynthesis.onvoiceschanged=loadV}
+function say(t,r=.9){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=r;if(voice)u.voice=voice;speechSynthesis.speak(u)}
+function showWord(k){const v=M[k];if(!v)return;side.innerHTML='<div class="rvword">'+v[0]+'</div><div class="pos">'+v[1]+'</div><div class="zh">'+v[2]+'</div><button class="speak" id="sideSpeak">🔊 發音</button>';sideSpeak.onclick=()=>say(v[0],.9);say(v[0],.9)}
+document.querySelectorAll(".read-vocab").forEach(el=>el.onclick=e=>{e.stopPropagation();showWord(el.dataset.w)});
+function paragraphs(){return Array.from(document.querySelectorAll("#readingText p"))}
+function mark(i,scroll=true){const ps=paragraphs();idx=Math.max(0,Math.min(i,ps.length-1));ps.forEach((p,n)=>p.style.background=n===idx?"#edf5fc":"transparent");if(scroll)ps[idx].scrollIntoView({behavior:"smooth",block:"center"})}
+function speakPara(i,go){const ps=paragraphs();mark(i);speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(ps[idx].innerText);u.lang="en-US";u.rate=Number(rate.value);if(voice)u.voice=voice;u.onend=()=>{if(auto&&go&&idx<ps.length-1)speakPara(idx+1,true);else auto=false};speechSynthesis.speak(u)}
+paragraphs().forEach((p,i)=>p.onclick=e=>{if(e.target.classList.contains("read-vocab"))return;auto=false;speechSynthesis.cancel();mark(i,false)});
+continueBtn.onclick=()=>{auto=true;speakPara(idx,true)};restartBtn.onclick=()=>{auto=true;speakPara(0,true)};prevBtn.onclick=()=>{auto=false;speechSynthesis.cancel();mark(idx-1)};nextBtn.onclick=()=>{auto=false;speechSynthesis.cancel();mark(idx+1)};currentBtn.onclick=()=>{auto=false;speakPara(idx,false)};pauseBtn.onclick=()=>speechSynthesis.paused?speechSynthesis.resume():speechSynthesis.pause();stopBtn.onclick=()=>{auto=false;speechSynthesis.cancel()};
+readTab.onclick=()=>{readTab.classList.add("active");vocabTab.classList.remove("active");readPane.classList.remove("hidden");vocabPane.classList.add("hidden")};
+vocabTab.onclick=()=>{vocabTab.classList.add("active");readTab.classList.remove("active");vocabPane.classList.remove("hidden");readPane.classList.add("hidden")};
+vlist.innerHTML=V.map(v=>'<article class="vocab"><div class="wordside"><div><span class="word">'+v[0]+'</span><button class="speak" data-say="'+v[0]+'">🔊</button></div><div class="pos">'+v[1]+'</div><div class="zh">'+v[2]+'</div></div><div class="detail"><b>English:</b> '+v[3]+'<div class="example"><b>Example:</b> '+v[4]+'<br><b>中文：</b>'+v[5]+'</div></div></article>').join("");
+document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>say(b.dataset.say,.9));mark(0,false);
+</script>
+</body></html>
