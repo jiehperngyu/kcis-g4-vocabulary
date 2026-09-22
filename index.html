@@ -10,7 +10,7 @@ h1{margin:0;font-size:clamp(30px,5vw,46px)}header p{margin:7px 0 0;opacity:.92}.
 button{border:0;border-radius:999px;padding:10px 15px;background:#fff;color:var(--ink);font-weight:800;cursor:pointer;box-shadow:0 3px 10px #00000012}button.active,.primary{background:var(--blue);color:#fff}
 .library{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.unit{background:#fff;border:1px solid #315f8c1a;border-radius:18px;padding:17px;box-shadow:var(--shadow)}
 .unit h3{margin:0 0 12px;font-size:18px}.unit-actions{display:flex;gap:7px;flex-wrap:wrap}.unit-actions button{font-size:13px;padding:8px 11px;background:#eef5fb;color:var(--dark)}
-.unit-actions button.active{background:var(--blue);color:#fff}.panel{background:#fff;border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-top:14px}.hidden{display:none!important}
+.unit-actions button.active{background:var(--blue);color:#fff}.unit-actions a{font-size:13px;padding:8px 11px;background:#eef5fb;color:var(--dark);border-radius:999px;font-weight:800;text-decoration:none;box-shadow:0 3px 10px #00000012}.panel{background:#fff;border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-top:14px}.hidden{display:none!important}
 .back{margin-bottom:12px}.mode-title{font-size:26px;font-weight:900;margin:5px 0 4px}.hint{color:var(--muted);font-size:14px;margin-bottom:14px}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.filters button{font-size:13px;background:#eef5fb}.filters button.active{background:var(--blue);color:#fff}
 .vocab-list{display:grid;gap:11px}.vocab{display:grid;grid-template-columns:minmax(220px,30%) 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -55,7 +55,7 @@ function renderHome(){
  const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
  if(page==="quiz"){renderQuizHome();return}
  if(page==="reading"){const titles=textbookTitles();h.innerHTML='<div class="library">'+titles.map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit(decodeURIComponent('${safeArg(t)}'),'read')">📖 Read</button>${groupsFor(t).length?`<button onclick="openUnit(decodeURIComponent('${safeArg(t)}'),'vocab')">📝 Vocabulary</button>`:""}</div></article>`).join("")+'</div>'}
- else if(page==="short"){const t=shortArticles[0].title;h.innerHTML=`<div class="library"><article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openShort('read')">📖 Read</button><button onclick="openShort('vocab')">📝 Vocabulary</button></div></article></div>`}
+ else if(page==="short"){const t=shortArticles[0].title;h.innerHTML=`<div class="library"><article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><a class="home" href="./nature-build-in-armor.html#read">📖 Read</a><a class="home" href="./nature-build-in-armor.html#vocab">📝 Vocabulary</a></div></article></div>`}
  else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL(decodeURIComponent('${safeArg(g)}'),'vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
 }
 
