@@ -52,8 +52,8 @@ function groupLabel(g,t){const pt=practiceTitle(t);return g.indexOf(pt+"-")===0?
 function renderHome(){
  const h=document.getElementById("home"),s=document.getElementById("study");s.classList.add("hidden");h.classList.remove("hidden");
  if(page==="quiz"){renderQuizHome();return}
- if(page==="reading"||page==="short"){const titles=page==="reading"?textbookTitles():shortTitles();h.innerHTML='<div class="library">'+titles.map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','read')">📖 Read</button>${groupsFor(t).length?`<button onclick="openUnit('${esc(t).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button>`:""}</div></article>`).join("")+'</div>'}
- else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL('${esc(g).replace(/'/g,"\\'")}','vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
+ if(page==="reading"||page==="short"){const titles=page==="reading"?textbookTitles():shortTitles();h.innerHTML='<div class="library">'+titles.map(t=>`<article class="unit"><h3>${esc(t)}</h3><div class="unit-actions"><button onclick="openUnit(decodeURIComponent('${encodeURIComponent(t)}'),'read')">📖 Read</button>${groupsFor(t).length?`<button onclick="openUnit(decodeURIComponent('${encodeURIComponent(t)}'),'vocab')">📝 Vocabulary</button>`:""}</div></article>`).join("")+'</div>'}
+ else{const gs=[...new Set(words.filter(w=>isESL(w.group)).map(w=>w.group))];h.innerHTML='<div class="library">'+gs.map(g=>`<article class="unit"><h3>${esc(g)}</h3><div class="unit-actions"><button onclick="openESL(decodeURIComponent('${encodeURIComponent(g)}'),'vocab')">📝 Vocabulary</button></div></article>`).join("")+'</div>'}
 }
 
 function renderQuizHome(){
@@ -143,7 +143,7 @@ function showReadVocab(i){
 }
 function renderVocab(){
  const p=pool(),gs=(page==="reading"||page==="short")?groupsFor(activeTitle):[activeTitle];const b=document.getElementById("modeBody");
- b.innerHTML=((page==="reading"||page==="short")?`<div class="filters"><button class="active" onclick="drawVocab('all',this)">全部 ${p.length}</button>${gs.map(g=>`<button onclick="drawVocab('${esc(g).replace(/'/g,"\\'")}',this)">${esc(groupLabel(g,activeTitle))}</button>`).join("")}</div>`:"")+'<div id="vlist" class="vocab-list"></div>';
+ b.innerHTML=((page==="reading"||page==="short")?`<div class="filters"><button class="active" onclick="drawVocab('all',this)">全部 ${p.length}</button>${gs.map(g=>`<button onclick="drawVocab(decodeURIComponent('${encodeURIComponent(g)}'),this)">${esc(groupLabel(g,activeTitle))}</button>`).join("")}</div>`:"")+'<div id="vlist" class="vocab-list"></div>';
  drawVocab("all");
 }
 function drawVocab(g,btn){
