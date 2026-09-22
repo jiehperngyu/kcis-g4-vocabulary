@@ -1753,5 +1753,230 @@
     "en": "to make small changes to fix or improve something",
     "example": "Dad tinkered with the lamp until it worked again.",
     "exzh": "爸爸對檯燈小修小改，直到它恢復運作。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "relies",
+    "pos": "verb",
+    "zh": "依靠；依賴",
+    "en": "depends on someone or something for help or support",
+    "example": "The otter relies on its fur to stay warm.",
+    "exzh": "水獺依靠牠的毛皮保持溫暖。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "unique",
+    "pos": "adjective",
+    "zh": "獨特的；獨一無二的",
+    "en": "different from all others in a special way",
+    "example": "Each animal has a unique way to survive.",
+    "exzh": "每種動物都有獨特的生存方式。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "survival",
+    "pos": "noun",
+    "zh": "生存；存活",
+    "en": "the act of staying alive",
+    "example": "Thick fur helps the otter's survival in cold water.",
+    "exzh": "厚毛皮幫助水獺在冷水中生存。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "system",
+    "pos": "noun",
+    "zh": "系統；體系",
+    "en": "a group of connected parts that work together",
+    "example": "The animal has a system that helps it stay alive.",
+    "exzh": "這種動物有一套幫助牠生存的系統。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "creatures",
+    "pos": "noun",
+    "zh": "生物；動物",
+    "en": "living things, especially animals",
+    "example": "Many creatures have special ways to protect themselves.",
+    "exzh": "許多生物都有特殊的方法保護自己。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "navigate",
+    "pos": "verb",
+    "zh": "穿越；在……中找到方向",
+    "en": "to find a way through or around a place",
+    "example": "Animals must navigate difficult environments.",
+    "exzh": "動物必須在困難的環境中找到方向。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "natural",
+    "pos": "adjective",
+    "zh": "自然的",
+    "en": "found in nature and not made by people",
+    "example": "The river is part of the otter's natural habitat.",
+    "exzh": "河流是水獺自然棲息環境的一部分。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "environments",
+    "pos": "noun",
+    "zh": "環境",
+    "en": "the places and conditions in which living things live",
+    "example": "Animals live in many different environments.",
+    "exzh": "動物生活在許多不同的環境中。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "consider",
+    "pos": "verb",
+    "zh": "想想看；考慮",
+    "en": "to think carefully about something",
+    "example": "Consider how the otter moves through the water.",
+    "exzh": "想想看水獺如何在水中移動。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "glides",
+    "pos": "verb",
+    "zh": "滑行；順暢移動",
+    "en": "moves smoothly and easily",
+    "example": "The otter glides through the cold water.",
+    "exzh": "水獺順暢地滑過冰冷的水。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "curved",
+    "pos": "adjective",
+    "zh": "彎曲的",
+    "en": "having a bent or rounded shape",
+    "example": "The otter has a curved body shape.",
+    "exzh": "水獺的身體外形是彎曲流線的。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "contour",
+    "pos": "noun",
+    "zh": "輪廓；外形",
+    "en": "the outer shape or outline of something",
+    "example": "The contour of its body helps it move through water.",
+    "exzh": "牠身體的輪廓幫助牠在水中移動。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "effort",
+    "pos": "noun",
+    "zh": "力氣；努力",
+    "en": "the energy used to do something",
+    "example": "The otter swims with very little effort.",
+    "exzh": "水獺游泳時幾乎不用費力。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "adaptations",
+    "pos": "noun",
+    "zh": "適應特徵；適應方式",
+    "en": "features or behaviors that help a living thing survive",
+    "example": "Thick fur is one of the otter's adaptations.",
+    "exzh": "厚毛皮是水獺的適應特徵之一。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "resists",
+    "pos": "verb",
+    "zh": "抵抗；耐受",
+    "en": "stays strong against damage or pressure",
+    "example": "The otter's fur resists wear and tear.",
+    "exzh": "水獺的毛皮能耐受磨損。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "rough",
+    "pos": "adjective",
+    "zh": "粗糙的；崎嶇的",
+    "en": "not smooth; having an uneven surface",
+    "example": "The otter may rub against rough rocks.",
+    "exzh": "水獺可能會摩擦到粗糙的岩石。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "riverbanks",
+    "pos": "noun",
+    "zh": "河岸",
+    "en": "the land along the sides of a river",
+    "example": "Otters often live near riverbanks.",
+    "exzh": "水獺常住在河岸附近。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "beneath",
+    "pos": "preposition",
+    "zh": "在……下面",
+    "en": "under or below something",
+    "example": "Warm underfur lies beneath the guard hairs.",
+    "exzh": "保暖的底毛位在護毛下面。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "layer",
+    "pos": "noun",
+    "zh": "層",
+    "en": "one thickness of material covering something",
+    "example": "The otter has a soft layer of underfur.",
+    "exzh": "水獺有一層柔軟的底毛。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "distinct",
+    "pos": "adjective",
+    "zh": "明顯不同的；獨特的",
+    "en": "clearly different or easy to recognize",
+    "example": "Each animal has distinct physical features.",
+    "exzh": "每種動物都有明顯不同的身體特徵。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "raise",
+    "pos": "verb",
+    "zh": "豎起；抬起",
+    "en": "to lift or move something upward",
+    "example": "A porcupine can raise its bristles.",
+    "exzh": "豪豬可以豎起牠的硬毛。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "bristles",
+    "pos": "noun",
+    "zh": "硬毛；剛毛",
+    "en": "short, stiff hairs",
+    "example": "The porcupine raises its bristles when threatened.",
+    "exzh": "豪豬受到威脅時會豎起硬毛。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "frighten",
+    "pos": "verb",
+    "zh": "使害怕；嚇走",
+    "en": "to make someone or something feel afraid",
+    "example": "Sharp quills can frighten predators away.",
+    "exzh": "尖銳的刺可以把掠食者嚇走。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "meanwhile",
+    "pos": "adverb",
+    "zh": "同時；另一方面",
+    "en": "at the same time",
+    "example": "The otter swims; meanwhile, birds build nests nearby.",
+    "exzh": "水獺在游泳；同時，附近的鳥正在築巢。"
+  },
+  {
+    "group": "Nature's Build-In Armor-P1",
+    "word": "trait",
+    "pos": "noun",
+    "zh": "特徵；特性",
+    "en": "a particular quality or feature of a living thing",
+    "example": "Every useful trait helps an animal survive.",
+    "exzh": "每個有用的特徵都能幫助動物生存。"
   }
 ]
