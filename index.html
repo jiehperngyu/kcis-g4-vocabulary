@@ -165,7 +165,9 @@ async function loadReadingData(){
  if(!("DecompressionStream"in window))throw new Error("Browser does not support gzip reader data");
  const ds=new DecompressionStream("gzip");
  const txt=await new Response(new Blob([bin]).stream().pipeThrough(ds)).text();
- return JSON.parse(txt);
+ const baseData=JSON.parse(txt);
+ const extra=await fetch("./reading-extra.json",{cache:"no-store"}).then(r=>r.ok?r.json():[]).catch(()=>[]);
+ return baseData.concat(extra);
 }
 document.querySelectorAll(".top").forEach(b=>b.onclick=()=>{stopReading();document.querySelectorAll(".top").forEach(x=>x.classList.remove("active"));b.classList.add("active");page=b.dataset.page;renderHome()});
 Promise.all([fetch("./vocabulary.json",{cache:"no-store"}).then(r=>r.json()),loadReadingData().catch(()=>[])]).then(([d,r])=>{words=d;readings=r;renderHome()}).catch(()=>home.innerHTML='<div class="panel">資料載入失敗，請重新整理。</div>');
