@@ -86,9 +86,13 @@ function mark(i,scroll=true){const ps=paragraphs();idx=Math.max(0,Math.min(i,ps.
 function speakPara(i,go){const ps=paragraphs();mark(i);speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(ps[idx].innerText);u.lang="en-US";u.rate=Number(rate.value);if(voice)u.voice=voice;u.onend=()=>{if(auto&&go&&idx<ps.length-1)speakPara(idx+1,true);else auto=false};speechSynthesis.speak(u)}
 paragraphs().forEach((p,i)=>p.onclick=e=>{if(e.target.classList.contains("read-vocab"))return;auto=false;speechSynthesis.cancel();mark(i,false)});
 continueBtn.onclick=()=>{auto=true;speakPara(idx,true)};restartBtn.onclick=()=>{auto=true;speakPara(0,true)};prevBtn.onclick=()=>{auto=false;speechSynthesis.cancel();mark(idx-1)};nextBtn.onclick=()=>{auto=false;speechSynthesis.cancel();mark(idx+1)};currentBtn.onclick=()=>{auto=false;speakPara(idx,false)};pauseBtn.onclick=()=>speechSynthesis.paused?speechSynthesis.resume():speechSynthesis.pause();stopBtn.onclick=()=>{auto=false;speechSynthesis.cancel()};
-readTab.onclick=()=>{readTab.classList.add("active");vocabTab.classList.remove("active");readPane.classList.remove("hidden");vocabPane.classList.add("hidden")};
-vocabTab.onclick=()=>{vocabTab.classList.add("active");readTab.classList.remove("active");vocabPane.classList.remove("hidden");readPane.classList.add("hidden")};
+function showRead(){readTab.classList.add("active");vocabTab.classList.remove("active");readPane.classList.remove("hidden");vocabPane.classList.add("hidden");location.hash="read"}
+function showVocab(){vocabTab.classList.add("active");readTab.classList.remove("active");vocabPane.classList.remove("hidden");readPane.classList.add("hidden");location.hash="vocab"}
+readTab.onclick=showRead;
+vocabTab.onclick=showVocab;
 vlist.innerHTML=V.map(v=>'<article class="vocab"><div class="wordside"><div><span class="word">'+v[0]+'</span><button class="speak" data-say="'+v[0]+'">🔊</button></div><div class="pos">'+v[1]+'</div><div class="zh">'+v[2]+'</div></div><div class="detail"><b>English:</b> '+v[3]+'<div class="example"><b>Example:</b> '+v[4]+'<br><b>中文：</b>'+v[5]+'</div></div></article>').join("");
-document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>say(b.dataset.say,.9));mark(0,false);
+document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>say(b.dataset.say,.9));
+mark(0,false);
+if(location.hash==="#vocab")showVocab();else showRead();
 </script>
 </body></html>
