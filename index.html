@@ -42,6 +42,21 @@ const shortArticles=[{"title":"Nature's Build-In Armor","category":"short","para
 const titleAliases={"From Minn of the Mississippi":"from Minn of the Mississippi","from Butterfly Eyes and Other Secrets of the Meadow":"from Butterfly Eyes","Feathers, Not Just for Flying":"Feathers, Not just for fling"};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeArg=s=>encodeURIComponent(String(s)).replace(/'/g,"%27");
+const BASIC_WORDS=new Set(("a an the and or but if so because as at by for from in into of on to with about after before over under through during up down out off around near across behind between without within is am are was were be been being do does did have has had can could may might must shall should will would i me my mine we us our ours you your yours he him his she her hers it its they them their theirs this that these those who whom whose which what when where why how not no yes one two three four five six seven eight nine ten first second third last next more most much many few little very too also only just even still ever never always often sometimes then now here there again already all any both each every either neither some such other another same own new old young big small long short high low good better best bad worse worst right left day days night nights morning afternoon year years time times way ways thing things people person man woman boy girl child children family mother father sister brother friend friends home house school work job name names said say says tell told ask asked answer get got gets make made take took come came go went gone see saw seen look looked hear heard know knew known think thought want wanted like liked love loved give gave given find found found use used used help helped keep kept put let try tried start started stop stopped live lived move moved moved walk walked run ran play played read write wrote written learn learned eat ate drink drank sleep slept sit sat stand stood open opened close closed call called called show showed turn turned bring brought buy bought pay paid hold held feel felt felt become became leave left mean meant need needed seem seemed begin began began while than really maybe well together away back down around before after inside outside today tomorrow yesterday week month world country city water food air land animal animals bird birds tree trees plant plants room door hand hands head face eye eyes ear ears mouth foot feet body book books story stories light dark white black red blue green yellow happy sad afraid scared excited important different same easy hard hot cold warm cool fast slow early late full empty strong weak soft hard").split(/\s+/));
+const translationCache=JSON.parse(localStorage.getItem("kcisZhCache")||"{}");
+async function translateWord(word){
+ const key=String(word).toLowerCase();
+ if(translationCache[key])return translationCache[key];
+ try{
+  const u="https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-TW&dt=t&q="+encodeURIComponent(word);
+  const r=await fetch(u); if(!r.ok)throw new Error("translate");
+  const d=await r.json(); const zh=(d&&d[0]||[]).map(x=>x&&x[0]||"").join("").trim();
+  if(zh){translationCache[key]=zh;localStorage.setItem("kcisZhCache",JSON.stringify(translationCache));return zh}
+ }catch(e){}
+ return "中文翻譯暫時無法載入";
+}
+function isBasicWord(w){return BASIC_WORDS.has(String(w).toLowerCase())}
+
 function base(g){return g.replace(/-skills vocab$/,"").replace(/-P[12]$/,"")}
 function isESL(g){return g.startsWith("ESL2 Lesson")}
 function practiceTitle(t){return titleAliases[t]||t}
@@ -101,13 +116,32 @@ function renderMode(){
 }
 function rx(s){var specials="^$.*+?()[]{}|";return String(s).split("").map(function(ch){return specials.indexOf(ch)>=0?String.fromCharCode(92)+ch:ch}).join("")}
 function markedParagraph(text,vocab){
- if(!vocab||!vocab.length)return esc(text);
- const map=new Map(vocab.map((v,i)=>[String(v.word).toLowerCase(),i]));
- const pats=[...map.keys()].sort((a,b)=>b.length-a.length).map(rx);
- const re=new RegExp("(?<![A-Za-z])("+pats.join("|")+")(?![A-Za-z])","gi");
- let out="",last=0,m;
- while((m=re.exec(text))){out+=esc(text.slice(last,m.index));const key=m[0].toLowerCase(),i=map.get(key);out+=`<span class="read-vocab" data-v="${i}" onclick="event.stopPropagation();showReadVocab(Number(this.dataset.v))">${esc(m[0])}</span>`;last=m.index+m[0].length}
- return out+esc(text.slice(last));
+ if(!vocab)vocab=[];
+ const isShort=shortTitles().includes(activeTitle);
+ const phrases=vocab.map((v,i)=>({v,i,key:String(v.word).toLowerCase()})).filter(x=>/\s/.test(x.key)).sort((a,b)=>b.key.length-a.key.length);
+ const singles=new Map(vocab.map((v,i)=>[String(v.word).toLowerCase(),i]));
+ let out="",p=0,lower=String(text).toLowerCase();
+ while(p<text.length){
+  let ph=null;
+  for(const x of phrases){
+   const end=p+x.key.length;
+   if(lower.slice(p,end)===x.key&&!/[A-Za-z]/.test(text[p-1]||"")&&!/[A-Za-z]/.test(text[end]||"")){ph=x;break}
+  }
+  if(ph){
+   const shown=text.slice(p,p+ph.key.length);
+   out+=`<span class="read-vocab" data-v="${ph.i}" data-word="${esc(ph.v.word)}" onclick="event.stopPropagation();showReadWord(this.dataset.word,Number(this.dataset.v))">${esc(shown)}</span>`;
+   p+=ph.key.length;continue;
+  }
+  const m=text.slice(p).match(/^[A-Za-z]+(?:'[A-Za-z]+)?/);
+  if(m){
+   const shown=m[0],key=shown.toLowerCase(),vi=singles.has(key)?singles.get(key):-1;
+   const mark=isShort?vi>=0:(!isBasicWord(key)||vi>=0);
+   out+=mark?`<span class="read-vocab" data-v="${vi}" data-word="${esc(shown)}" onclick="event.stopPropagation();showReadWord(this.dataset.word,Number(this.dataset.v))">${esc(shown)}</span>`:esc(shown);
+   p+=shown.length;continue;
+  }
+  out+=esc(text[p]);p++;
+ }
+ return out;
 }
 function renderRead(){
  const b=document.getElementById("modeBody"),a=articleFor(activeTitle);
@@ -138,11 +172,15 @@ function nextParagraph(){readerAuto=false;speechSynthesis.cancel();setCurrentPar
 function speakCurrent(){readerAuto=false;speakParagraph(readerIndex,false)}
 function togglePause(){if(!("speechSynthesis"in window))return;if(speechSynthesis.paused)speechSynthesis.resume();else speechSynthesis.pause()}
 function stopReading(){readerAuto=false;if("speechSynthesis"in window)speechSynthesis.cancel()}
-function showReadVocab(i){
- const a=articleFor(activeTitle),v=a&&a.vocab&&a.vocab[i];if(!v)return;readerAuto=false;
- const card=document.getElementById("readVocabCard");if(card)card.innerHTML=`<div class="rvword"><span class="rvmark">${esc(v.mark||"")}</span>${esc(v.word)}</div><div class="pos">${esc(v.pos||"")}</div><div class="zh">${esc(v.zh||"")}</div><button class="speak" style="margin:10px 0 0" onclick="say('${esc(v.word).replace(/'/g,"\\'")}',.9)">🔊 發音</button><div class="hint" style="margin-top:10px">★ G4 建議要會 ｜ ○ 閱讀認得即可 ｜ ◆ 專有名詞</div>`;
- say(v.word,.9);
+async function showReadWord(word,i){
+ const a=articleFor(activeTitle),v=a&&a.vocab&&i>=0?a.vocab[i]:null;readerAuto=false;
+ const card=document.getElementById("readVocabCard");if(!card)return;
+ const shown=v&&v.word?v.word:word;
+ card.innerHTML=`<div class="rvword">${v&&v.mark?`<span class="rvmark">${esc(v.mark)}</span>`:""}${esc(shown)}</div><div class="pos">${v&&v.pos?esc(v.pos):""}</div><div class="zh" id="dynamicZh">${v&&v.zh?esc(v.zh):"翻譯載入中…"}</div><button class="speak" id="dynamicSpeak" style="margin:10px 0 0">🔊 發音</button>${v?`<div class="hint" style="margin-top:10px">★ G4 建議要會 ｜ ○ 閱讀認得即可 ｜ ◆ 專有名詞</div>`:""}`;
+ document.getElementById("dynamicSpeak").onclick=()=>say(shown,.9);say(shown,.9);
+ if(!(v&&v.zh)){const zh=await translateWord(word);const z=document.getElementById("dynamicZh");if(z)z.textContent=zh}
 }
+function showReadVocab(i){const a=articleFor(activeTitle),v=a&&a.vocab&&a.vocab[i];if(v)showReadWord(v.word,i)}
 function renderVocab(){
  const p=pool(),gs=page==="reading"?groupsFor(activeTitle):[activeTitle];const b=document.getElementById("modeBody");
  b.innerHTML=(page==="reading"?`<div class="filters"><button class="active" onclick="drawVocab('all',this)">全部 ${p.length}</button>${gs.map(g=>`<button onclick="drawVocab(decodeURIComponent('${safeArg(g)}'),this)">${esc(groupLabel(g,activeTitle))}</button>`).join("")}</div>`:"")+'<div id="vlist" class="vocab-list"></div>';
