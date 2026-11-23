@@ -112,7 +112,20 @@ function drawGlobalQ(){
  root.innerHTML=`<div class="panel quiz"><div class="score">Score: ${correct} / ${answered}　 Question ${qi+1} / ${quizSet.length}</div><div class="question">Which word means “${esc(w.en)}”?</div><div class="choices">${cs.map(c=>`<button class="choice" data-w="${esc(c.word)}">${esc(c.word)}</button>`).join("")}</div><div id="gfb" style="margin-top:12px;font-weight:900"></div></div>`;
  root.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>{if(root.querySelector(".choice.correct,.choice.wrong"))return;answered++;root.querySelectorAll(".choice").forEach(x=>{if(x.dataset.w===w.word)x.classList.add("correct")});if(btn.dataset.w===w.word){correct++;document.getElementById("gfb").textContent="✅ Correct!"}else{btn.classList.add("wrong");document.getElementById("gfb").textContent="❌ 正確答案是 "+w.word}setTimeout(()=>{qi++;drawGlobalQ()},700)});
 }
-function openUnit(t,m){activeTitle=t;activeMode=m;showStudy()} function openESL(g,m){activeTitle=g;activeMode=m;showStudy()} function openShort(m){activeTitle=shortArticles[0].title;activeMode=m;showStudy()}
+function openUnit(t,m){
+  activeTitle=t;
+  activeMode=m;
+
+  if (typeof gtag === "function") {
+    gtag("event", "reading_open", {
+      reading_title: t,
+      reading_mode: m
+    });
+  }
+
+  showStudy();
+}
+function openESL(g,m){activeTitle=g;activeMode=m;showStudy()} function openShort(m){activeTitle=shortArticles[0].title;activeMode=m;showStudy()}
 function pool(){return page==="reading"?words.filter(w=>base(w.group)===practiceTitle(activeTitle)):words.filter(w=>w.group===activeTitle)}
 function showStudy(){
  document.getElementById("home").classList.add("hidden");const s=document.getElementById("study");s.classList.remove("hidden");
