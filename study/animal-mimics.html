@@ -72,6 +72,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .vs{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;font-weight:700}
 .vr{border-bottom:2px dotted var(--muted)}
 .cn{border:2px solid var(--red);border-radius:5px;padding:0 3px}
+.readbtn{font:inherit;font-size:13px;font-weight:700;color:var(--leaf);background:var(--leaf-tint);border:0;border-radius:999px;padding:2px 12px;cursor:pointer}
+.readbtn.on{background:var(--leaf);color:var(--paper)}
+.w.reading{background:var(--hl);box-shadow:0 2px 0 var(--yellow)}
 .w.sel{background:var(--leaf-tint);color:var(--leaf)}
 .w.found{background:var(--ok-bg);color:var(--ok)}
 .ptext.sentmode .w{border-radius:0}.w.hov{background:var(--hl)}
@@ -197,8 +200,40 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
     if (text.slice(start).trim()) out.push([start, text.length]);
     return out;
   }
+  var voice = null;
+  function pickVoice(){
+    try { var vs = speechSynthesis.getVoices();
+      voice = vs.filter(function(v){ return /samantha/i.test(v.name); })[0] || vs.filter(function(v){ return /^en-US$/i.test(v.lang || ""); })[0] || vs.filter(function(v){ return (v.lang || "").indexOf("en") === 0; })[0] || null;
+    } catch (e) {}
+  }
+  if ("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  var reading = null; // {btn, box}
+  function stopReading(){
+    try { speechSynthesis.cancel(); } catch (e) {}
+    if (reading){ reading.btn.classList.remove("on"); reading.btn.textContent = "▶ 朗讀這段";
+      reading.box.querySelectorAll(".w.reading").forEach(function(x){ x.classList.remove("reading"); }); reading = null; }
+  }
+  function utter(text, rate){
+    var u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = rate; if (voice) u.voice = voice; return u;
+  }
   function speak(word){
-    try { var u = new SpeechSynthesisUtterance(word); u.lang = "en-US"; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+    stopReading();
+    try { speechSynthesis.speak(utter(word, .85)); } catch (e) {}
+  }
+  function readAloud(text, box, btn){
+    if (reading && reading.btn === btn){ stopReading(); return; }
+    stopReading();
+    if (!("speechSynthesis" in window)){ btn.textContent = "這台裝置不能朗讀"; return; }
+    var u = utter(text, .9);
+    reading = {btn: btn, box: box}; btn.classList.add("on"); btn.textContent = "■ 停止";
+    var words = Array.prototype.slice.call(box.querySelectorAll(".w"));
+    u.onboundary = function(e){
+      if (!reading || reading.box !== box) return;
+      var i = e.charIndex;
+      words.forEach(function(w){ w.classList.toggle("reading", +w.dataset.a <= i && i < +w.dataset.b); });
+    };
+    u.onend = u.onerror = function(){ if (reading && reading.box === box) stopReading(); };
+    speechSynthesis.speak(u);
   }
 
   // ---------- passage ----------
@@ -238,8 +273,11 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
     if (card.kind === "brk") return el("div", "brk", card.text);
     var desk = el("div", "desk"), left = el("div", "leftcol"), panel = el("div", "panel");
     desk.id = "c-" + card.id;
-    left.appendChild(el("div", "plabel", card.label + "<small>點字看意思</small>"));
+    var lab = el("div", "plabel", "<span>" + card.label + "</span>");
+    var rb = el("button", "readbtn", "▶ 朗讀這段"); rb.type = "button"; lab.appendChild(rb);
+    left.appendChild(lab);
     var ptext = renderPassage(card); left.appendChild(ptext);
+    rb.onclick = function(){ readAloud(card.text, ptext, rb); };
     var bar = el("div", "tapbar"); bar.hidden = true; left.appendChild(bar);
     var wb = el("div", "wordbox empty", "點文章裡畫底線或點線的字，這裡會出現它的意思和字族。");
     panel.appendChild(wb);
@@ -477,7 +515,7 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
     store.unit = String(n); save();
     var target = h && document.getElementById(h); if (target) target.scrollIntoView({block: "start"});
   }
-  window.addEventListener("hashchange", route);
+  window.addEventListener("hashchange", function(){ stopReading(); route(); });
 
   document.getElementById("reset").addEventListener("click", function(){
     if (this.dataset.sure !== "1"){ this.dataset.sure = "1"; this.textContent = "再按一次就清除全部"; return; }
