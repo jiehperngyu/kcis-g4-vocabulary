@@ -10,6 +10,21 @@
   gtag('js', new Date());
   gtag('config', 'G-8G0V9KLE3R');
 </script>
+
+ 
+<!-- GA4 Learning Analytics -->
+<script>
+function trackEvent(name, params = {}) {
+  try {
+    if (typeof gtag === "function") {
+      gtag("event", name, params);
+    }
+  } catch (e) {
+    // Keep website functions working.
+  }
+}
+</script>
+
  
 <!-- deploy refresh 2026-09-21 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
