@@ -107,12 +107,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .og{display:inline-flex;flex-wrap:wrap;gap:6px;vertical-align:middle;border:1.5px dashed var(--line);border-radius:14px;padding:4px 6px;margin:2px 0}
 .og .opt{margin:0}
 .og.vert{display:grid;gap:4px;margin-top:6px;width:100%}
-.pair{display:grid;grid-template-columns:minmax(0,max-content) minmax(0,1fr);gap:6px 10px;align-items:center;padding:6px 0}
+.pair{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:6px 0}
+.pair .pl{flex:1 1 200px;min-width:0}
+.pair .og{flex:0 1 auto;max-width:100%}
 .pair+.pair{border-top:1px dotted var(--line)}
 .pl{font-weight:700}
 .pl::after{content:"　→ 選一個";font-weight:400;font-size:13px;color:var(--muted)}
 .ptail{margin-top:4px}
-@media (max-width:560px){.pair{grid-template-columns:1fr}}
+@media (max-width:560px){.pair .pl{flex-basis:100%}}
 .opt{font:inherit;font-size:15px;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:3px 12px;margin:4px 6px 0 0;cursor:pointer;text-align:left;line-height:1.4}
 .og.vert .opt,.choice .opt{border-radius:10px;margin:0;width:100%}
 .opt:hover{border-color:var(--leaf)}
@@ -153,10 +155,9 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
 @media (max-width:760px){.desk{grid-template-columns:1fr}.leftcol{position:static}.ptext{font-size:17px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-
-
 </head>
 <body>
+
 <div class="wrap">
   <header class="hero">
     <p style="margin:12px 0 8px"><a href="../" style="color:var(--leaf);font-weight:700;text-decoration:none">← 回到 KCIS G4 Vocabulary</a></p>
