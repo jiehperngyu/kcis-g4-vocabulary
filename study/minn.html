@@ -527,7 +527,7 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
       });
       tw.appendChild(tb); box.appendChild(tw);
     }
-    function paintAutos(){ autos.forEach(function(td){ var on = toolsDone(td.dataset.n); td.classList.toggle("lock", !on); td.textContent = on ? td.dataset.t : "完成 Unit " + td.dataset.n + " 的理解工具後出現"; }); }
+    function paintAutos(){ autos.forEach(function(td){ var on = toolsDone(td.dataset.n); td.classList.toggle("lock", !on); var uu = DATA.units.filter(function(x){ return String(x.n) === String(td.dataset.n); })[0]; td.textContent = on ? td.dataset.t : "完成 Unit " + (uu ? uu.disp : td.dataset.n) + " 的理解工具後出現"; }); }
     if (autos.length){ paintAutos(); document.addEventListener("am-progress", paintAutos); }
     var bank = el("div", "bank"), cards = [];
     b.cards.forEach(function(c, i){
@@ -543,8 +543,17 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
     box.appendChild(bank);
     var fin = el("p", "bdone", "✓ 完成！"); box.appendChild(fin);
     var placed = (store.tb[b.id] || []).slice();
-    function place(i){
-      var c = b.cards[i], d = slots[c.s];
+    function base(id){ return id && id.indexOf(".") > 0 ? id.split(".")[0] : id; }
+    var used = {};
+    function fits(i, id){
+      var c = b.cards[i];
+      if (!c.s || used[id]) return false;
+      if (c.s === id || (base(c.s) === base(id) && base(id) !== id)) return true;
+      return b.cards.some(function(o){ return o.s === id && o.t === c.t; });
+    }
+    function place(i, id){
+      var c = b.cards[i]; id = id || c.s; var d = slots[id];
+      if (!(id.charAt(0) === "b" && d.parentNode.classList.contains("bin"))) used[id] = 1;
       if (c.s.charAt(0) === "b" && d.parentNode.classList.contains("bin")){
         var chip = el("div", "chip"); chip.textContent = c.t; d.parentNode.insertBefore(chip, d);
       } else { d.textContent = c.t; d.classList.add("filled"); d.disabled = true; }
@@ -563,8 +572,8 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
         var d = slots[id];
         if (d.classList.contains("filled")) return;
         if (picked === null){ d.classList.add("no"); setTimeout(function(){ d.classList.remove("no"); }, 400); return; }
-        if (b.cards[picked].s === id){
-          place(picked); placed.push(picked); store.tb[b.id] = placed; save();
+        if (fits(picked, id)){
+          place(picked, id); placed.push([picked, id]); store.tb[b.id] = placed; save();
           picked = null; box.classList.remove("picking"); checkDone();
         } else {
           miss = true; var k = cards[picked]; k.classList.remove("wrong"); void k.offsetWidth; k.classList.add("wrong");
@@ -572,7 +581,8 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
         }
       };
     });
-    placed.forEach(place); checkDone();
+    placed = placed.map(function(x){ return Array.isArray(x) ? x : [x, b.cards[x].s]; });
+    placed.forEach(function(x){ place(x[0], x[1]); }); checkDone();
     return box;
   }
 
@@ -645,7 +655,7 @@ button:focus-visible,a:focus-visible,.w:focus-visible{outline:3px solid var(--ye
   if (DATA.summary && DATA.summary.length){
     var st = el("a", "utab sum", "<b>總整理</b><span>Concept Charts</span><i></i>"); st.href = "#unit-summary"; st.dataset.u = "summary"; tabsEl.appendChild(st);
     var sw = el("div", "unit"); sw.id = "unit-summary"; sw.dataset.unit = "summary"; sw.hidden = true;
-    sw.innerHTML = '<header class="uhead"><span class="badge">總整理</span><h2>Concept Charts</h2><p class="range">把四個 Unit 讀到的東西整理成表。每做完一個 Unit 的理解工具，Chart A 就會多長出一列。</p></header>';
+    sw.innerHTML = '<header class="uhead"><span class="badge">總整理</span><h2>Concept Charts</h2><p class="range">把各個 Unit 讀到的東西整理成表。灰色的格子會在你做完那個 Unit 的理解工具後長出內容。</p></header>';
     DATA.summary.forEach(function(b){ sw.appendChild(renderBoard(b)); });
     main.appendChild(sw);
   }
